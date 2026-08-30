@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+chat_history.txt
+knowledge.txt
+chat_sessions.json
+.env

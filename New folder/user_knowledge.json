@@ -1,0 +1,61 @@
+{
+    "user_name": "Harsh",
+    "roll_no": "23035004049",
+    "user_dob": "27 September 2005",
+    "birthday": "27 September 2005",
+    "college": "NGF College of Engineering and Technology, Palwal",
+    "course": "B.Tech Computer Science & Engineering",
+    "assistant_name": "Vrixa",
+    "location": "Palwal, Haryana (Delhi-NCR)",
+    "friends_data": {
+        "harshit": {
+            "name": "Harshit",
+            "dob": "14 May 2005",
+            "location": "Khambi"
+        },
+        "ayush": {
+            "name": "Ayush",
+            "dob": "18 June 2004",
+            "location": "Palwal"
+        },
+        "kartikey": {
+            "name": "Kartikey",
+            "dob": "December 2005",
+            "location": "Palwal"
+        },
+        "kartik": {
+            "name": "Kartik",
+            "dob": "November 2005",
+            "location": "Hodal"
+        },
+        "aniket": {
+            "name": "Aniket",
+            "dob": "24 August 2003",
+            "location": "Pingor"
+        },
+        "bhupender": {
+            "name": "Bhupender",
+            "dob": "17 August 2005",
+            "location": "Palwal"
+        }
+    },
+    "friends": [
+        "Harshit",
+        "Ayush",
+        "Kartikey",
+        "Kartik",
+        "Aniket",
+        "Bhupender"
+    ],
+    "memories": [
+        "Friends: Harshit (DOB: 14 May 2005, Khambi), Ayush (DOB: 18 June 2004, Palwal), Kartikey (DOB: December 2005, Palwal), Kartik (DOB: November 2005, Hodal), Aniket (DOB: 24 August 2003, Pingor), Bhupender (DOB: 17 August 2005, Palwal)"
+    ],
+    "friend_bday_181801": "friends birthday",
+    "tasks": [
+        {
+            "id": 1,
+            "task": "Buy project printout and submit synopsis",
+            "time": "30 Aug, 09:33 PM"
+        }
+    ]
+}

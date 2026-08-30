@@ -6,12 +6,20 @@ import datetime
 import urllib.request
 import urllib.parse
 import subprocess
-import ctypes
 import base64
 from io import BytesIO
 from PIL import Image
 import psutil
-import pyautogui
+try:
+    import pyautogui
+except Exception:
+    pyautogui = None
+
+try:
+    import ctypes
+except Exception:
+    ctypes = None
+
 import wikipedia
 wikipedia.set_user_agent("VrixaAIAssistant/2.0 (contact@example.com)")
 from fastapi import FastAPI, Request, HTTPException

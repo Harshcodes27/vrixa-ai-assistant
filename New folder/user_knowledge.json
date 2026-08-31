@@ -37,6 +37,11 @@
             "name": "Bhupender",
             "dob": "17 August 2005",
             "location": "Palwal"
+        },
+        "akash": {
+            "name": "Akash",
+            "dob": "12 November 2005",
+            "location": "Ballabgarh"
         }
     },
     "friends": [
@@ -45,10 +50,11 @@
         "Kartikey",
         "Kartik",
         "Aniket",
-        "Bhupender"
+        "Bhupender",
+        "Akash"
     ],
     "memories": [
-        "Friends: Harshit (DOB: 14 May 2005, Khambi), Ayush (DOB: 18 June 2004, Palwal), Kartikey (DOB: December 2005, Palwal), Kartik (DOB: November 2005, Hodal), Aniket (DOB: 24 August 2003, Pingor), Bhupender (DOB: 17 August 2005, Palwal)"
+        "Friends: Harshit (DOB: 14 May 2005, Khambi), Ayush (DOB: 18 June 2004, Palwal), Kartikey (DOB: December 2005, Palwal), Kartik (DOB: November 2005, Hodal), Aniket (DOB: 24 August 2003, Pingor), Bhupender (DOB: 17 August 2005, Palwal), Akash (DOB: 12 November 2005, Ballabgarh)"
     ],
     "friend_bday_181801": "friends birthday",
     "tasks": [

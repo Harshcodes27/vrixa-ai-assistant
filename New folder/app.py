@@ -556,7 +556,8 @@ async def process_chat(req: ChatRequest):
                 "kartikey": {"name": "Kartikey", "dob": "December 2005", "location": "Palwal"},
                 "kartik": {"name": "Kartik", "dob": "November 2005", "location": "Hodal"},
                 "aniket": {"name": "Aniket", "dob": "24 August 2003", "location": "Pingor"},
-                "bhupender": {"name": "Bhupender", "dob": "17 August 2005", "location": "Palwal"}
+                "bhupender": {"name": "Bhupender", "dob": "17 August 2005", "location": "Palwal"},
+                "akash": {"name": "Akash", "dob": "12 November 2005", "location": "Ballabgarh"}
             })
 
             # Check individual friend query first

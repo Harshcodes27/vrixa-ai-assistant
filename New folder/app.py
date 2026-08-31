@@ -1002,19 +1002,19 @@ async def process_chat(req: ChatRequest):
             if is_task_request:
                 if any(w in text_lower for w in ["letter", "patra", "chitti", "application", "mail", "email"]):
                     reply_text = (
-                        "Here is a formal letter template for you Sir:\n\n"
+                        "Here is a formal letter template for you, Harsh:\n\n"
                         "[Date]\nTo, [Recipient Name/Title]\n[Company/Organization]\n\n"
                         "Subject: Formal Request / Application\n\n"
                         "Dear Sir/Madam,\n\n"
                         "I am writing this letter to formally bring to your attention regarding...\n\n"
-                        "Thanking you,\nSincerely,\n[Your Name]"
+                        "Thanking you,\nSincerely,\nHarsh"
                     )
                 else:
-                    reply_text = "Sir, Gemini AI limit reached or offline! Please add a new API key in Settings to generate custom AI content."
+                    reply_text = "⚠️ Harsh, Gemini AI free rate limit temporarily reach ho gayi hai! Aap **⚙ Settings** mein jakar nayi free Gemini API Key daal sakte hain ya 1-2 minute baad dobara try kar sakte hain."
             else:
                 is_greeting = any(w in text_lower for w in ["haal", "hal", "kaise", "kese", "hello", "hi", "hey", "sup", "greetings"])
                 if is_greeting:
-                    reply_text = "All systems optimal Sir! Ready for your commands."
+                    reply_text = "All systems optimal, Harsh! Ready for your commands. ⚡"
                 else:
                     try:
                         # Dedicated Hinglish to English Query Translator/Normalizer specifically for Wikipedia

@@ -723,9 +723,212 @@
         .add-event-btn:hover {
             opacity: 0.9;
         }
+
+        /* ========================================================= */
+        /* RESPONSIVE DESIGN FOR PHONES, TABLETS & DESKTOPS          */
+        /* ========================================================= */
+
+        .btn-hamburger {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: #00F0FF;
+            font-size: 18px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            line-height: 1;
+            margin-right: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-hamburger:hover {
+            background: rgba(0, 240, 255, 0.2);
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+        .sidebar-backdrop.active {
+            display: block;
+        }
+
+        /* Large Screens (Laptops & Desktops) */
+        @media (min-width: 1024px) {
+            .sidebar {
+                width: 270px;
+            }
+            .message-row {
+                max-width: 65%;
+            }
+            .bubble {
+                font-size: 15px;
+            }
+            .marvel-title {
+                font-size: 38px;
+            }
+        }
+
+        /* Medium Screens / Tablets (769px to 1023px) */
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .sidebar {
+                width: 230px;
+            }
+            .message-row {
+                max-width: 78%;
+            }
+            .btn-desktop-extra {
+                display: none !important;
+            }
+        }
+
+        /* Mobile Screens (Phones < 768px) */
+        @media (max-width: 768px) {
+            body {
+                position: relative;
+            }
+
+            /* Responsive Sidebar Drawer on Phones */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -290px;
+                width: 270px;
+                height: 100vh;
+                z-index: 999;
+                box-shadow: 5px 0 25px rgba(0, 0, 0, 0.85);
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .sidebar.open {
+                left: 0;
+            }
+
+            .btn-hamburger {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Responsive Header on Phones */
+            .header {
+                padding: 0 10px;
+                height: 54px;
+            }
+            .header h1 {
+                font-size: 15px;
+                letter-spacing: 0.5px;
+            }
+            .header-title-text {
+                display: inline-block;
+                max-width: 120px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .badge-status {
+                font-size: 11px;
+                padding: 3px 6px;
+            }
+            .btn-desktop-hide {
+                display: none !important;
+            }
+            .btn-settings, .btn-mute-toggle {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+
+            /* Responsive Chat Messages */
+            .chat-messages {
+                padding: 12px 8px;
+                gap: 10px;
+            }
+            .message-row {
+                max-width: 90%;
+            }
+            .bubble {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            /* Responsive Input Container */
+            .input-container {
+                padding: 6px 8px;
+                gap: 5px;
+            }
+            .chat-input {
+                padding: 9px 10px;
+                font-size: 13px;
+            }
+            .btn-send {
+                padding: 9px 12px;
+                font-size: 13px;
+            }
+            .btn-action-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
+            }
+
+            /* Responsive Marvel Intro HUD Overlay */
+            .jarvis-hud-container {
+                width: 140px;
+                height: 140px;
+                margin-bottom: 16px;
+            }
+            .hud-outer-dashed { width: 140px; height: 140px; }
+            .hud-mid-arc { width: 115px; height: 115px; }
+            .hud-mid-solid { width: 90px; height: 90px; }
+            .hud-inner-glow { width: 70px; height: 70px; }
+            .hud-jarvis-text { font-size: 11px; letter-spacing: 2px; }
+
+            .stark-header {
+                font-size: 10px;
+                letter-spacing: 1.5px;
+                padding: 0 10px;
+                line-height: 1.3;
+            }
+            .marvel-title {
+                font-size: 20px;
+                padding: 0 8px;
+                line-height: 1.3;
+                margin-bottom: 8px;
+            }
+            .hud-status {
+                font-size: 10px;
+                letter-spacing: 1px;
+                margin-bottom: 20px;
+                padding: 0 10px;
+            }
+            .btn-tap-continue {
+                padding: 12px 24px;
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+
+            /* Responsive Calendar Panel on Mobile */
+            .calendar-panel.open {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 85vw;
+                height: 100vh;
+                z-index: 1000;
+                box-shadow: -5px 0 25px rgba(0, 0, 0, 0.85);
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
 
     <!-- Marvel / Stark HUD Intro Overlay -->
     <div id="marvelIntro" class="marvel-intro-overlay">
@@ -747,6 +950,10 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-weight: 700; color: #00F0FF; font-size: 14px; letter-spacing: 1px;">⚡ VRIXA SESSIONS</span>
+            <button class="btn-copy btn-desktop-hide" onclick="closeMobileSidebar()" style="font-size: 16px; color: #EF4444;">✖</button>
+        </div>
         <button class="btn-new-chat" onclick="createNewChat()">+ New Chat</button>
         <div class="history-title">Chat History</div>
         <div class="session-list" id="sessionList"></div>
@@ -756,15 +963,18 @@
     <!-- Main Chat Pane -->
     <div class="main-chat">
         <div class="header">
-            <h1>⚡ VRIXA AI ASSISTANT</h1>
+            <div style="display: flex; align-items: center;">
+                <button class="btn-hamburger" onclick="toggleMobileSidebar()" title="Open Chat History">☰</button>
+                <h1>⚡ <span class="header-title-text">VRIXA AI</span></h1>
+            </div>
             <div class="header-controls">
-                <span id="statusBadge" class="badge-status online">🟢 AI Online</span>
-                <button class="btn-settings" onclick="playStarkBootSound(); speak('VRIXA online and fully operational. Welcome back, Harsh.');">⚡ Boot Sound</button>
-                <button class="btn-settings" onclick="sendQuickPrompt('Introduce the project')">🎓 Viva Pitch</button>
-                <button class="btn-settings" onclick="sendQuickPrompt('System diagnostics')">💻 Diagnostics</button>
-                <button class="btn-mute-toggle" id="quickMuteBtn" onclick="toggleQuickMute()">🔊 Sound ON</button>
-                <button class="btn-settings" onclick="toggleCalendarPanel()">🗓️ Calendar</button>
-                <button class="btn-settings" onclick="toggleModal(true)">⚙ Settings</button>
+                <span id="statusBadge" class="badge-status online">🟢 Live</span>
+                <button class="btn-settings btn-desktop-hide btn-desktop-extra" onclick="playStarkBootSound(); speak('VRIXA online and fully operational.');">⚡ Boot</button>
+                <button class="btn-settings btn-desktop-hide" onclick="sendQuickPrompt('Introduce the project')">🎓 Viva Pitch</button>
+                <button class="btn-settings btn-desktop-hide btn-desktop-extra" onclick="sendQuickPrompt('System diagnostics')">💻 Diag</button>
+                <button class="btn-mute-toggle" id="quickMuteBtn" onclick="toggleQuickMute()">🔊 <span class="btn-desktop-hide">Sound</span></button>
+                <button class="btn-settings" onclick="toggleCalendarPanel()">🗓️ <span class="btn-desktop-hide">Calendar</span></button>
+                <button class="btn-settings" onclick="toggleModal(true)">⚙</button>
             </div>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
@@ -1054,6 +1264,21 @@
                 await fetch('/api/sessions', { method: 'DELETE' });
             } catch (err) {}
             createNewChat();
+            closeMobileSidebar();
+        }
+
+        function toggleMobileSidebar() {
+            const sb = document.querySelector('.sidebar');
+            const bd = document.getElementById('sidebarBackdrop');
+            if (sb) sb.classList.toggle('open');
+            if (bd) bd.classList.toggle('active');
+        }
+
+        function closeMobileSidebar() {
+            const sb = document.querySelector('.sidebar');
+            const bd = document.getElementById('sidebarBackdrop');
+            if (sb) sb.classList.remove('open');
+            if (bd) bd.classList.remove('active');
         }
 
         function selectSession(s) {
@@ -1062,6 +1287,7 @@
             container.innerHTML = '';
             (s.messages || []).forEach(m => addBubble(m.text, m.sender, m.timestamp));
             loadSessions();
+            closeMobileSidebar();
         }
 
         function formatMarkdown(text) {

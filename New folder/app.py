@@ -627,8 +627,8 @@ async def process_chat(req: ChatRequest):
             # 5. College Viva Special: Project Self-Presentation & Architecture Pitch
             elif any(w in text_lower for w in ["introduce the project", "project intro", "project introduction", "viva demo", "viva presentation", "project pitch", "project summary", "explain your architecture", "project details"]):
                 reply_text = (
-                    "🎓 **Major Project Presentation Pitch**:\n\n"
-                    "Good day respected faculty and examiners. I am **VRIXA**, an Intelligent Multimodal AI Assistant developed by **Harsh (Roll No: 23035004049)** as the Major Project for **B.Tech Computer Science & Engineering** at **NGF College of Engineering & Technology, Palwal**.\n\n"
+                    "🎓 **Final Year Project Presentation Pitch**:\n\n"
+                    "Good day respected faculty and examiners. I am **VRIXA**, an Intelligent Multimodal AI Assistant developed by **Harsh (Roll No: 23035004049)** as the Final Year Project for **B.Tech Computer Science & Engineering** at **NGF College of Engineering & Technology, Palwal**.\n\n"
                     "⚡ **Key Architectural Highlights**:\n"
                     "• **Backend Engine**: Asynchronous Python FastAPI with multi-client network endpoints.\n"
                     "• **AI Intelligence**: Google Gemini multimodal model integration for contextual reasoning & real-time screen vision.\n"

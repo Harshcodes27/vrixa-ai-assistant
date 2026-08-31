@@ -1413,30 +1413,49 @@
             container.appendChild(typingRow);
             container.scrollTop = container.scrollHeight;
 
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        session_id: currentSessionId, 
-                        message: msg || "Analyze this image", 
-                        model: model,
-                        api_key: apiKey,
-                        image_base64: sentImage
-                    })
-                });
+            let data = null;
+            let success = false;
+            let lastErr = null;
 
-                // Remove typing indicator
-                const indicator = document.getElementById('typingIndicator');
-                if (indicator) indicator.remove();
+            // Robust Auto-Retry mechanism (up to 3 attempts with backoff)
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    const res = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            session_id: currentSessionId, 
+                            message: msg || "Analyze this image", 
+                            model: model,
+                            api_key: apiKey,
+                            image_base64: sentImage
+                        })
+                    });
 
-                if (!res.ok) {
-                    addBubble(`⚠️ Server busy or temporarily unavailable (HTTP ${res.status}). Please try again.`, 'bot');
-                    return;
+                    if (res.ok) {
+                        data = await res.json();
+                        success = true;
+                        break;
+                    } else if (res.status === 502 || res.status === 503 || res.status === 504) {
+                        // Server is waking up or deploying, wait 2s and retry
+                        await new Promise(r => setTimeout(r, 2000));
+                    } else {
+                        lastErr = `HTTP ${res.status}`;
+                        break;
+                    }
+                } catch (fetchErr) {
+                    lastErr = fetchErr;
+                    if (attempt < 3) {
+                        await new Promise(r => setTimeout(r, 1500));
+                    }
                 }
+            }
 
-                const data = await res.json();
-                
+            // Remove typing indicator
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+
+            if (success && data) {
                 // Update API Status Badge
                 const badge = document.getElementById('statusBadge');
                 if (data.api_status === 'offline') {
@@ -1456,10 +1475,12 @@
                 if (document.getElementById('calendarPanel').classList.contains('open')) {
                     loadCalendar();
                 }
-            } catch (err) {
-                const indicator = document.getElementById('typingIndicator');
-                if (indicator) indicator.remove();
-                addBubble("⚠️ **Connection Error**: Vrixa Backend Server band hai. Kripya Desktop par **'VRIXA AI'** icon par double-click karke server start karein.", 'bot');
+            } else {
+                const isRenderCloud = window.location.hostname.includes('onrender.com');
+                const errMsg = isRenderCloud 
+                    ? `⚠️ **Cloud Server Reconnecting**: Render Cloud instance abhi wake-up ya restart ho raha hai. <br><button onclick="sendQuickPrompt('${(msg || "").replace(/'/g, "\\'")}')" style="margin-top: 8px; background: #00F0FF; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;">🔄 Click to Retry Message</button>`
+                    : `⚠️ **Server Disconnected**: Local backend reconnect nahi ho pa raha. <br><button onclick="sendQuickPrompt('${(msg || "").replace(/'/g, "\\'")}')" style="margin-top: 8px; background: #00F0FF; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;">🔄 Click to Retry Message</button>`;
+                addBubble(errMsg, 'bot');
             }
         }
 
@@ -1727,6 +1748,7 @@
         }, 180000); // 3 minutes interval
 
         window.onload = () => {
+            fetch('/api/ping').catch(() => {});
             loadSessions();
             loadCalendar();
         };

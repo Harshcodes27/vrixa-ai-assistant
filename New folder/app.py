@@ -939,8 +939,8 @@ async def process_chat(req: ChatRequest):
             try:
                 now_str = get_ist_now().strftime("%A, %I:%M %p")
                 sys_inst = (
-                    f"You are VRIXA, an intelligent and fast AI assistant created by Harsh. Current time: {now_str}. "
-                    "Rules: 1. Be natural, warm, and direct. 2. Match language (Hinglish/English). 3. Keep responses crisp (1-3 sentences) with relevant emojis. 4. Never give long lectures unless asked."
+                    f"You are VRIXA, an intelligent, conversational AI assistant created by Harsh. Current time: {now_str}. "
+                    "Rules: 1. Be natural, warm, and helpful. 2. Match language (Hinglish/English). 3. Keep responses clear and complete — always finish every sentence and word properly. 4. Use appropriate emojis."
                 )
                 
                 pil_image = None
@@ -953,7 +953,7 @@ async def process_chat(req: ChatRequest):
                         print(f"[Image Decode Error] {img_e}")
 
                 convo_history = []
-                recent_turns = session["context"][-3:]
+                recent_turns = session["context"][-4:]
                 for turn in recent_turns:
                     role_str = "User" if turn["role"] == "user" else "Vrixa"
                     convo_history.append(f"{role_str}: {turn['content']}")
@@ -977,8 +977,8 @@ async def process_chat(req: ChatRequest):
                             contents=gemini_contents,
                             config=types.GenerateContentConfig(
                                 system_instruction=sys_inst,
-                                max_output_tokens=180,
-                                temperature=0.6
+                                max_output_tokens=1024,
+                                temperature=0.7
                             )
                         )
                         if resp and hasattr(resp, 'text') and resp.text:

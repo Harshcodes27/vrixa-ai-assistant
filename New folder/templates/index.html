@@ -407,8 +407,8 @@
         }
         .modal-content {
             background: #1E2029;
-            width: 90vw;
-            max-width: 440px;
+            width: 92vw;
+            max-width: 500px;
             max-height: 88vh;
             overflow-y: auto;
             padding: 20px;
@@ -417,12 +417,15 @@
             box-sizing: border-box;
         }
         .modal-content h2 {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: #60A5FA;
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .setting-item {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -433,8 +436,9 @@
             align-items: center;
         }
         .setting-item label {
-            font-size: 14px;
+            font-size: 13px;
             color: #CBD5E1;
+            font-weight: 500;
         }
         .setting-item select, .setting-item input[type="range"], .setting-item input[type="text"] {
             background: #0D0E12;
@@ -447,6 +451,109 @@
         .setting-item input[type="text"]:focus {
             border-color: #3B82F6;
         }
+
+        /* Multi-AI Provider Cards in Settings */
+        .provider-card {
+            background: #14161F;
+            border: 1px solid #2A2E3D;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+        .provider-card:hover {
+            border-color: rgba(0, 240, 255, 0.35);
+        }
+        .provider-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .provider-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: #F8FAFC;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .provider-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            color: #94A3B8;
+        }
+        .provider-badge.ready {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ADE80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .provider-badge.testing {
+            background: rgba(0, 240, 255, 0.2);
+            color: #00F0FF;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+        .provider-badge.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .provider-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .provider-input {
+            width: 100%;
+            background: #0D0E12;
+            color: #FFF;
+            border: 1px solid #334155;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .provider-input:focus {
+            border-color: #00F0FF;
+        }
+        .btn-test-prov {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: #00F0FF;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-test-prov:hover {
+            background: #00F0FF;
+            color: #000;
+        }
+
+        .provider-used-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 6px;
+        }
+        .tag-gemini { background: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .tag-claude { background: rgba(217, 119, 6, 0.2); color: #FBBF24; border: 1px solid rgba(217, 119, 6, 0.3); }
+        .tag-openai { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-ollama { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tag-offline { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
         .btn-close-modal {
             width: 100%;
             background: linear-gradient(135deg, #1E40AF, #1E3A8A);
@@ -1097,29 +1204,141 @@
     <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h2>⚙ Preferences & Configuration</h2>
-            <div class="setting-item row">
-                <label>Voice Output (Browser TTS)</label>
-                <input type="checkbox" id="voiceToggle" checked onchange="syncMuteBtn()">
+            <h2>
+                <span>⚙ Settings & Multi-AI Router</span>
+                <span style="font-size: 11px; color: #00F0FF; font-weight: normal; letter-spacing: 0.5px;">Auto-Fallback Active ⚡</span>
+            </h2>
+
+            <!-- Voice & Audio Settings -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid #232736; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
+                <div class="setting-item row" style="margin-bottom: 8px;">
+                    <label>🔊 Voice Output (Browser TTS)</label>
+                    <input type="checkbox" id="voiceToggle" checked onchange="syncMuteBtn()">
+                </div>
+                <div class="setting-item row" style="margin-bottom: 0;">
+                    <label>⚡ Speech Speed</label>
+                    <input type="range" id="speechRate" min="0.8" max="1.5" step="0.1" value="1.0" style="max-width: 140px;">
+                </div>
             </div>
-            <div class="setting-item row">
-                <label>Speech Rate</label>
-                <input type="range" id="speechRate" min="0.8" max="1.5" step="0.1" value="1.0">
+
+            <!-- Multi-AI System Title -->
+            <div style="font-size: 12px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span>⚡ AI Fallback Providers</span>
+                <span style="font-size: 10px; color: #64748B;">Priority: 1➔2➔3➔4➔5</span>
             </div>
-            <div class="setting-item row">
-                <label>AI Model</label>
-                <select id="modelSelect">
-                    <option value="gemini-3.6-flash" selected>gemini-3.6-flash (Fast & Advanced Multimodal)</option>
-                    <option value="gemini-3.5-flash">gemini-3.5-flash</option>
-                    <option value="gemini-3.7-flash">gemini-3.7-flash</option>
-                </select>
+
+            <!-- 1. Google Gemini Provider Card -->
+            <div class="provider-card" id="cardGemini">
+                <div class="provider-card-header">
+                    <div class="provider-name">
+                        <input type="checkbox" id="geminiToggle" checked style="accent-color: #3B82F6;">
+                        <span>🔵 1. Google Gemini <span style="font-size: 10px; color: #60A5FA;">(Primary)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span class="provider-badge ready" id="badgeGemini">🟢 Active</span>
+                        <button type="button" class="btn-test-prov" onclick="testProvider('gemini')">🧪 Test</button>
+                    </div>
+                </div>
+                <div class="provider-fields">
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Model</small>
+                        <select id="geminiModel" class="provider-input">
+                            <option value="gemini-3.6-flash" selected>gemini-3.6-flash</option>
+                            <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                            <option value="gemini-3.7-flash">gemini-3.7-flash</option>
+                        </select>
+                    </div>
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Custom API Key (Optional)</small>
+                        <input type="password" id="geminiKey" class="provider-input" placeholder="Server default active" autocomplete="new-password">
+                    </div>
+                </div>
             </div>
-            <div class="setting-item">
-                <label>Custom Gemini API Key (Optional)</label>
-                <input type="text" id="apiKeyInput" placeholder="Paste new Gemini API Key here...">
-                <small style="color: #64748B; font-size: 11px;">If limit expires, paste a new API key here to continue seamlessly.</small>
+
+            <!-- 2. Anthropic Claude Provider Card -->
+            <div class="provider-card" id="cardClaude">
+                <div class="provider-card-header">
+                    <div class="provider-name">
+                        <input type="checkbox" id="claudeToggle" checked style="accent-color: #D97706;">
+                        <span>🟠 2. Anthropic Claude <span style="font-size: 10px; color: #FBBF24;">(1st Fallback)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span class="provider-badge" id="badgeClaude">⚪ Standby</span>
+                        <button type="button" class="btn-test-prov" onclick="testProvider('claude')">🧪 Test</button>
+                    </div>
+                </div>
+                <div class="provider-fields">
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Model</small>
+                        <select id="claudeModel" class="provider-input">
+                            <option value="claude-3-5-haiku-20241022" selected>claude-3-5-haiku</option>
+                            <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet</option>
+                        </select>
+                    </div>
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Anthropic API Key</small>
+                        <input type="password" id="claudeKey" class="provider-input" placeholder="sk-ant-..." autocomplete="new-password">
+                    </div>
+                </div>
             </div>
-            <button class="btn-close-modal" onclick="saveSettings()">Save & Close</button>
+
+            <!-- 3. OpenAI Provider Card -->
+            <div class="provider-card" id="cardOpenAI">
+                <div class="provider-card-header">
+                    <div class="provider-name">
+                        <input type="checkbox" id="openaiToggle" checked style="accent-color: #10B981;">
+                        <span>🟢 3. OpenAI <span style="font-size: 10px; color: #34D399;">(2nd Fallback)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span class="provider-badge" id="badgeOpenAI">⚪ Standby</span>
+                        <button type="button" class="btn-test-prov" onclick="testProvider('openai')">🧪 Test</button>
+                    </div>
+                </div>
+                <div class="provider-fields">
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Model</small>
+                        <select id="openaiModel" class="provider-input">
+                            <option value="gpt-4o-mini" selected>gpt-4o-mini</option>
+                            <option value="gpt-4o">gpt-4o</option>
+                        </select>
+                    </div>
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">OpenAI API Key</small>
+                        <input type="password" id="openaiKey" class="provider-input" placeholder="sk-proj-..." autocomplete="new-password">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Local Ollama Provider Card -->
+            <div class="provider-card" id="cardOllama">
+                <div class="provider-card-header">
+                    <div class="provider-name">
+                        <input type="checkbox" id="ollamaToggle" checked style="accent-color: #8B5CF6;">
+                        <span>🟣 4. Local Ollama <span style="font-size: 10px; color: #C084FC;">(Local AI)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span class="provider-badge" id="badgeOllama">⚪ Local Daemon</span>
+                        <button type="button" class="btn-test-prov" onclick="testProvider('ollama')">🧪 Test</button>
+                    </div>
+                </div>
+                <div class="provider-fields">
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Model Name</small>
+                        <input type="text" id="ollamaModel" class="provider-input" value="llama3.2" placeholder="llama3.2 / qwen2.5">
+                    </div>
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Base URL</small>
+                        <input type="text" id="ollamaUrl" class="provider-input" value="http://localhost:11434" placeholder="http://localhost:11434">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Offline Knowledge Engine Note -->
+            <div style="padding: 6px 10px; background: rgba(0, 240, 255, 0.05); border: 1px dashed rgba(0, 240, 255, 0.2); border-radius: 6px; font-size: 11px; color: #94A3B8; margin-bottom: 14px;">
+                🛡️ <strong>5. Offline Engine:</strong> If all live cloud/local AI services are unavailable, VRIXA will seamlessly answer using the Offline Knowledge Base & Wikipedia.
+            </div>
+
+            <button class="btn-close-modal" onclick="saveSettings()">💾 Save Configuration & Close</button>
         </div>
     </div>
 
@@ -1130,10 +1349,89 @@
         let speechRecognitionInstance = null;
         let isListening = false;
 
-        // Load saved API Key on startup
-        const savedKey = localStorage.getItem('custom_gemini_api_key');
-        if (savedKey) {
-            document.getElementById('apiKeyInput').value = savedKey;
+        // Load saved Provider settings & API Keys on startup
+        function loadProviderSettings() {
+            // Keys
+            if (localStorage.getItem('vrixa_key_gemini')) document.getElementById('geminiKey').value = localStorage.getItem('vrixa_key_gemini');
+            if (localStorage.getItem('vrixa_key_claude')) document.getElementById('claudeKey').value = localStorage.getItem('vrixa_key_claude');
+            if (localStorage.getItem('vrixa_key_openai')) document.getElementById('openaiKey').value = localStorage.getItem('vrixa_key_openai');
+            
+            // Models & URLs
+            if (localStorage.getItem('vrixa_model_gemini')) document.getElementById('geminiModel').value = localStorage.getItem('vrixa_model_gemini');
+            if (localStorage.getItem('vrixa_model_claude')) document.getElementById('claudeModel').value = localStorage.getItem('vrixa_model_claude');
+            if (localStorage.getItem('vrixa_model_openai')) document.getElementById('openaiModel').value = localStorage.getItem('vrixa_model_openai');
+            if (localStorage.getItem('vrixa_model_ollama')) document.getElementById('ollamaModel').value = localStorage.getItem('vrixa_model_ollama');
+            if (localStorage.getItem('vrixa_url_ollama')) document.getElementById('ollamaUrl').value = localStorage.getItem('vrixa_url_ollama');
+
+            // Toggles
+            if (localStorage.getItem('vrixa_toggle_gemini') !== null) document.getElementById('geminiToggle').checked = localStorage.getItem('vrixa_toggle_gemini') === 'true';
+            if (localStorage.getItem('vrixa_toggle_claude') !== null) document.getElementById('claudeToggle').checked = localStorage.getItem('vrixa_toggle_claude') === 'true';
+            if (localStorage.getItem('vrixa_toggle_openai') !== null) document.getElementById('openaiToggle').checked = localStorage.getItem('vrixa_toggle_openai') === 'true';
+            if (localStorage.getItem('vrixa_toggle_ollama') !== null) document.getElementById('ollamaToggle').checked = localStorage.getItem('vrixa_toggle_ollama') === 'true';
+
+            // Sync live status from server
+            fetch('/api/providers/status')
+                .then(r => r.json())
+                .then(data => {
+                    (data.providers || []).forEach(p => {
+                        const bId = 'badge' + p.id.charAt(0).toUpperCase() + p.id.slice(1);
+                        const bEl = document.getElementById(bId);
+                        if (bEl) {
+                            if (p.configured) {
+                                bEl.className = 'provider-badge ready';
+                                bEl.innerText = '🟢 Ready';
+                            } else {
+                                bEl.className = 'provider-badge';
+                                bEl.innerText = p.id === 'ollama' ? '⚪ Local Daemon' : '⚪ No Key';
+                            }
+                        }
+                    });
+                })
+                .catch(() => {});
+        }
+
+        async function testProvider(providerId) {
+            const bId = 'badge' + providerId.charAt(0).toUpperCase() + providerId.slice(1);
+            const bEl = document.getElementById(bId);
+            if (bEl) {
+                bEl.className = 'provider-badge testing';
+                bEl.innerText = '⏳ Testing...';
+            }
+
+            const apiKey = providerId === 'gemini' ? document.getElementById('geminiKey').value.trim() :
+                           providerId === 'claude' ? document.getElementById('claudeKey').value.trim() :
+                           providerId === 'openai' ? document.getElementById('openaiKey').value.trim() : '';
+
+            const model = providerId === 'gemini' ? document.getElementById('geminiModel').value :
+                          providerId === 'claude' ? document.getElementById('claudeModel').value :
+                          providerId === 'openai' ? document.getElementById('openaiModel').value :
+                          document.getElementById('ollamaModel').value;
+
+            const baseUrl = providerId === 'ollama' ? document.getElementById('ollamaUrl').value.trim() : '';
+
+            try {
+                const res = await fetch('/api/providers/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider: providerId, api_key: apiKey, model, base_url: baseUrl })
+                });
+                const data = await res.json();
+                if (bEl) {
+                    if (data.success) {
+                        bEl.className = 'provider-badge ready';
+                        bEl.innerText = `✅ Ready (${data.response_time_ms}ms)`;
+                    } else {
+                        bEl.className = 'provider-badge error';
+                        bEl.innerText = `❌ ${data.message.substring(0, 18)}`;
+                        bEl.title = data.message;
+                    }
+                }
+            } catch (err) {
+                if (bEl) {
+                    bEl.className = 'provider-badge error';
+                    bEl.innerText = '❌ Failed';
+                }
+            }
         }
 
         // Image Attachment Handlers
@@ -1345,7 +1643,7 @@
             return html;
         }
 
-        function addBubble(text, sender, timeStr = null, imageSrc = null) {
+        function addBubble(text, sender, timeStr = null, imageSrc = null, provider = null) {
             const container = document.getElementById('chatMessages');
             const row = document.createElement('div');
             row.className = `message-row ${sender}`;
@@ -1354,13 +1652,26 @@
             let formattedText = formatMarkdown(text);
             let imageHtml = imageSrc ? `<div style="margin-bottom: 8px;"><img src="${imageSrc}" style="max-width: 260px; max-height: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); object-fit: cover;"></div>` : '';
 
+            let providerBadge = '';
+            if (sender === 'bot' && provider) {
+                const pClass = `tag-${provider.toLowerCase()}`;
+                const pName = provider === 'gemini' ? 'Gemini' :
+                              provider === 'claude' ? 'Claude' :
+                              provider === 'openai' ? 'OpenAI' :
+                              provider === 'ollama' ? 'Ollama' : 'Offline Engine';
+                providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
+            }
+
             row.innerHTML = `
                 <div class="bubble">
                     ${imageHtml}
                     ${formattedText}
                 </div>
                 <div class="sub-meta">
-                    <span>${now}</span>
+                    <div style="display: flex; align-items: center;">
+                        ${providerBadge}
+                        <span>${now}</span>
+                    </div>
                     ${sender === 'bot' ? `<button class="btn-copy" onclick="navigator.clipboard.writeText('${text.replace(/'/g, "\\'")}')">📋 Copy</button>` : ''}
                 </div>
             `;
@@ -1392,8 +1703,31 @@
             // Render user message bubble immediately
             addBubble(msg || "Analyze this image", 'user', null, sentImage);
 
-            const model = document.getElementById('modelSelect') ? document.getElementById('modelSelect').value : "gemini-3.6-flash";
-            const apiKey = document.getElementById('apiKeyInput') ? document.getElementById('apiKeyInput').value.trim() : "";
+            const customKeys = {
+                gemini: document.getElementById('geminiKey') ? document.getElementById('geminiKey').value.trim() : (localStorage.getItem('vrixa_key_gemini') || ''),
+                claude: document.getElementById('claudeKey') ? document.getElementById('claudeKey').value.trim() : (localStorage.getItem('vrixa_key_claude') || ''),
+                openai: document.getElementById('openaiKey') ? document.getElementById('openaiKey').value.trim() : (localStorage.getItem('vrixa_key_openai') || '')
+            };
+
+            const providerConfigs = {
+                gemini: {
+                    enabled: document.getElementById('geminiToggle') ? document.getElementById('geminiToggle').checked : true,
+                    model: document.getElementById('geminiModel') ? document.getElementById('geminiModel').value : 'gemini-3.6-flash'
+                },
+                claude: {
+                    enabled: document.getElementById('claudeToggle') ? document.getElementById('claudeToggle').checked : true,
+                    model: document.getElementById('claudeModel') ? document.getElementById('claudeModel').value : 'claude-3-5-haiku-20241022'
+                },
+                openai: {
+                    enabled: document.getElementById('openaiToggle') ? document.getElementById('openaiToggle').checked : true,
+                    model: document.getElementById('openaiModel') ? document.getElementById('openaiModel').value : 'gpt-4o-mini'
+                },
+                ollama: {
+                    enabled: document.getElementById('ollamaToggle') ? document.getElementById('ollamaToggle').checked : true,
+                    model: document.getElementById('ollamaModel') ? document.getElementById('ollamaModel').value : 'llama3.2',
+                    base_url: document.getElementById('ollamaUrl') ? document.getElementById('ollamaUrl').value : 'http://localhost:11434'
+                }
+            };
 
             // Instant typing indicator
             const container = document.getElementById('chatMessages');
@@ -1426,9 +1760,11 @@
                         body: JSON.stringify({ 
                             session_id: currentSessionId, 
                             message: msg || "Analyze this image", 
-                            model: model,
-                            api_key: apiKey,
-                            image_base64: sentImage
+                            model: providerConfigs.gemini.model,
+                            api_key: customKeys.gemini,
+                            image_base64: sentImage,
+                            custom_keys: customKeys,
+                            provider_configs: providerConfigs
                         })
                     });
 
@@ -1460,13 +1796,13 @@
                 const badge = document.getElementById('statusBadge');
                 if (data.api_status === 'offline') {
                     badge.className = 'badge-status offline';
-                    badge.innerText = '🔴 AI Offline';
+                    badge.innerText = '🔴 Offline Mode';
                 } else {
                     badge.className = 'badge-status online';
                     badge.innerText = '🟢 AI Online';
                 }
 
-                addBubble(data.reply, 'bot', data.timestamp);
+                addBubble(data.reply, 'bot', data.timestamp, null, data.provider);
                 speak(data.reply);
                 if (data.action_url) {
                     window.open(data.action_url, '_blank');
@@ -1509,12 +1845,28 @@
         }
 
         function saveSettings() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (key) {
-                localStorage.setItem('custom_gemini_api_key', key);
-            } else {
-                localStorage.removeItem('custom_gemini_api_key');
-            }
+            // Save Keys
+            const gKey = document.getElementById('geminiKey') ? document.getElementById('geminiKey').value.trim() : '';
+            const cKey = document.getElementById('claudeKey') ? document.getElementById('claudeKey').value.trim() : '';
+            const oKey = document.getElementById('openaiKey') ? document.getElementById('openaiKey').value.trim() : '';
+
+            if (gKey) localStorage.setItem('vrixa_key_gemini', gKey); else localStorage.removeItem('vrixa_key_gemini');
+            if (cKey) localStorage.setItem('vrixa_key_claude', cKey); else localStorage.removeItem('vrixa_key_claude');
+            if (oKey) localStorage.setItem('vrixa_key_openai', oKey); else localStorage.removeItem('vrixa_key_openai');
+
+            // Save Models
+            if (document.getElementById('geminiModel')) localStorage.setItem('vrixa_model_gemini', document.getElementById('geminiModel').value);
+            if (document.getElementById('claudeModel')) localStorage.setItem('vrixa_model_claude', document.getElementById('claudeModel').value);
+            if (document.getElementById('openaiModel')) localStorage.setItem('vrixa_model_openai', document.getElementById('openaiModel').value);
+            if (document.getElementById('ollamaModel')) localStorage.setItem('vrixa_model_ollama', document.getElementById('ollamaModel').value);
+            if (document.getElementById('ollamaUrl')) localStorage.setItem('vrixa_url_ollama', document.getElementById('ollamaUrl').value);
+
+            // Save Toggles
+            if (document.getElementById('geminiToggle')) localStorage.setItem('vrixa_toggle_gemini', document.getElementById('geminiToggle').checked);
+            if (document.getElementById('claudeToggle')) localStorage.setItem('vrixa_toggle_claude', document.getElementById('claudeToggle').checked);
+            if (document.getElementById('openaiToggle')) localStorage.setItem('vrixa_toggle_openai', document.getElementById('openaiToggle').checked);
+            if (document.getElementById('ollamaToggle')) localStorage.setItem('vrixa_toggle_ollama', document.getElementById('ollamaToggle').checked);
+
             toggleModal(false);
         }
 
@@ -1524,6 +1876,9 @@
 
         function toggleModal(show) {
             document.getElementById('settingsModal').style.display = show ? 'flex' : 'none';
+            if (show) {
+                loadProviderSettings();
+            }
         }
 
         function playStarkBootSound() {
@@ -1751,6 +2106,7 @@
             fetch('/api/ping').catch(() => {});
             loadSessions();
             loadCalendar();
+            loadProviderSettings();
         };
     </script>
 </body>

@@ -28,9 +28,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 from google import genai
 from google.genai import types
+from ai_providers import ai_orchestrator, generateAIResponse
 
 app = FastAPI(title="Vrixa AI Assistant Cloud API")
 
@@ -414,9 +416,48 @@ PREDEFINED_RESPONSES = {
 class ChatRequest(BaseModel):
     session_id: str
     message: str
-    model: str = "gemini-3.5-flash"
+    model: str = "gemini-3.6-flash"
     api_key: str | None = None
     image_base64: str | None = None
+    custom_keys: dict[str, str] | None = None
+    provider_configs: dict[str, dict[str, Any]] | None = None
+
+class ProviderTestRequest(BaseModel):
+    provider: str
+    api_key: str | None = None
+    model: str | None = None
+    base_url: str | None = None
+
+class ProviderConfigRequest(BaseModel):
+    provider: str
+    enabled: bool | None = None
+    model: str | None = None
+
+@app.get("/api/providers/status")
+async def get_providers_status(gemini_key: str | None = None, claude_key: str | None = None, openai_key: str | None = None):
+    custom_keys = {}
+    if gemini_key: custom_keys["gemini"] = gemini_key
+    if claude_key: custom_keys["claude"] = claude_key
+    if openai_key: custom_keys["openai"] = openai_key
+    return {"providers": ai_orchestrator.get_providers_status(custom_keys=custom_keys)}
+
+@app.post("/api/providers/test")
+async def test_provider_endpoint(req: ProviderTestRequest):
+    prov = ai_orchestrator.get_provider(req.provider)
+    if not prov:
+        return {"success": False, "provider": req.provider, "message": f"Unknown provider: {req.provider}", "response_time_ms": 0}
+    return await prov.test_connection(custom_key=req.api_key, model=req.model, base_url=req.base_url)
+
+@app.post("/api/providers/config")
+async def update_provider_config(req: ProviderConfigRequest):
+    prov = ai_orchestrator.get_provider(req.provider)
+    if not prov:
+        return {"success": False, "message": "Unknown provider"}
+    if req.enabled is not None:
+        prov.is_enabled = req.enabled
+    if req.model:
+        prov.default_model = req.model
+    return {"success": True, "provider": prov.provider_id, "enabled": prov.is_enabled, "model": prov.default_model}
 
 @app.get("/api/ping")
 async def ping_alive():
@@ -925,157 +966,34 @@ async def process_chat(req: ChatRequest):
                 except Exception:
                     reply_text = "Sorry Sir, I couldn't fetch Wikipedia results."
 
-        # Gemini AI Status tracking
-        active_client = gemini_client
-        if req.api_key and req.api_key.strip():
-            try:
-                active_client = genai.Client(api_key=req.api_key.strip())
-            except Exception as e:
-                print(f"[Custom API Key Client Error] {e}")
-
-        api_status = "online" if active_client else "offline"
-
-        if not reply_text and active_client:
-            try:
-                now_str = get_ist_now().strftime("%A, %I:%M %p")
-                sys_inst = (
-                    f"You are VRIXA, an intelligent, conversational AI assistant created by Harsh. Current time: {now_str}. "
-                    "Rules: 1. Be natural, warm, and helpful. 2. Match language (Hinglish/English). 3. Keep responses clear and complete — always finish every sentence and word properly. 4. Use appropriate emojis."
-                )
-                
-                pil_image = None
-                if req.image_base64:
-                    try:
-                        base64_data = req.image_base64.split(",")[-1]
-                        img_bytes = base64.b64decode(base64_data)
-                        pil_image = Image.open(BytesIO(img_bytes))
-                    except Exception as img_e:
-                        print(f"[Image Decode Error] {img_e}")
-
-                convo_history = []
-                recent_turns = session["context"][-4:]
-                for turn in recent_turns:
-                    role_str = "User" if turn["role"] == "user" else "Vrixa"
-                    convo_history.append(f"{role_str}: {turn['content']}")
-                
-                v_prompt = user_msg if user_msg and user_msg.strip() != "" else "Analyze this image in detail."
-                convo_history.append(f"User: {v_prompt}\nVrixa:")
-
-                gemini_contents = [pil_image, "\n".join(convo_history)] if pil_image else "\n".join(convo_history)
-
-                response = None
-                models_to_try = ["gemini-3.6-flash", "gemini-3.5-flash"]
-                if req.model and req.model in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash"]:
-                    if req.model not in models_to_try:
-                        models_to_try.insert(0, req.model)
-
-                for m_name in models_to_try:
-                    try:
-                        resp = await asyncio.to_thread(
-                            active_client.models.generate_content,
-                            model=m_name,
-                            contents=gemini_contents,
-                            config=types.GenerateContentConfig(
-                                system_instruction=sys_inst,
-                                max_output_tokens=1024,
-                                temperature=0.7
-                            )
-                        )
-                        if resp and hasattr(resp, 'text') and resp.text:
-                            response = resp
-                            break
-                    except Exception as try_err:
-                        print(f"[Fast Model Failover {m_name}] {try_err}")
-
-                if response and hasattr(response, 'text') and response.text:
-                    reply_text = response.text.strip()
-                    api_status = "online"
-                else:
-                    # All models failed / quota reached -> Mark offline and trigger offline predefined & Wikipedia search!
-                    api_status = "offline"
-            except Exception as e:
-                print(f"[Gemini Error] {e}")
-                api_status = "offline"
-
+        provider_used = "offline"
         if not reply_text:
-            is_task_request = any(w in text_lower for w in ["make", "write", "create", "generate", "draft", "banao", "likho", "tayyar"])
-            if is_task_request:
-                if any(w in text_lower for w in ["letter", "patra", "chitti", "application", "mail", "email"]):
-                    reply_text = (
-                        "Here is a formal letter template for you, Harsh:\n\n"
-                        "[Date]\nTo, [Recipient Name/Title]\n[Company/Organization]\n\n"
-                        "Subject: Formal Request / Application\n\n"
-                        "Dear Sir/Madam,\n\n"
-                        "I am writing this letter to formally bring to your attention regarding...\n\n"
-                        "Thanking you,\nSincerely,\nHarsh"
-                    )
-                else:
-                    reply_text = "⚠️ Harsh, Gemini AI free rate limit temporarily reach ho gayi hai! Aap **⚙ Settings** mein jakar nayi free Gemini API Key daal sakte hain ya 1-2 minute baad dobara try kar sakte hain."
-            else:
-                is_greeting = any(w in text_lower for w in ["haal", "hal", "kaise", "kese", "hello", "hi", "hey", "sup", "greetings"])
-                if is_greeting:
-                    reply_text = "All systems optimal, Harsh! Ready for your commands. ⚡"
-                else:
-                    try:
-                        # Dedicated Hinglish to English Query Translator/Normalizer specifically for Wikipedia
-                        stops = [
-                            r'\b(ke|ki|ka|ko|se|me|par|bhi|hi|pe|ne)\b',
-                            r'\b(barme|bare|baare|batao|bato|bataye|bataiye|bata|janana|jaanna|dikhaye|dikhao)\b',
-                            r'\b(what|who|where|when|why|how|is|are|was|were|tell|me|about|explain|describe)\b',
-                            r'\b(kon|kaun|kya|kaisa|kaisi|kaise|kab|kahan|kha|kaha|hai|h|hein|tha|thi|the)\b',
-                            r'\b(krte|krne|karna|karne|krna|karwa|karwane|karo|kare|hote|hota|hoti|karte|karta|karti|do|doing|make|use|used)\b',
-                            r'\b(sir|please|plz|bhai|bro|jarvis|ok)\b'
-                        ]
-                        cleaned_topic = user_msg
-                        for pat in stops:
-                            cleaned_topic = re.sub(pat, '', cleaned_topic, flags=re.IGNORECASE)
-                        cleaned_topic = re.sub(r'\s+', ' ', cleaned_topic).strip()
-                        search_q = cleaned_topic if len(cleaned_topic) >= 2 else user_msg
+            now_str = get_ist_now().strftime("%A, %I:%M %p")
+            sys_inst = (
+                f"You are VRIXA, an intelligent, conversational AI assistant created by Harsh. Current time: {now_str}. "
+                "Rules: 1. Be natural, warm, and helpful. 2. Match language (Hinglish/English). 3. Keep responses clear and complete — always finish every sentence and word properly. 4. Use appropriate emojis."
+            )
 
-                        wiki_summary = None
-                        queries_to_try = [search_q]
-                        words = [w for w in re.findall(r'\w+', search_q) if len(w) >= 3]
-                        if words and words[0].lower() not in queries_to_try:
-                            queries_to_try.append(words[0])
+            # Build custom_keys mapping
+            custom_keys_dict = dict(req.custom_keys or {})
+            if req.api_key and req.api_key.strip():
+                custom_keys_dict["gemini"] = req.api_key.strip()
 
-                        for q_term in queries_to_try:
-                            try:
-                                wiki_summary = wikipedia.summary(q_term, sentences=2, auto_suggest=False)
-                                if wiki_summary: break
-                            except wikipedia.exceptions.DisambiguationError as de:
-                                try:
-                                    valid_opt = [opt for opt in de.options if q_term.lower() in opt.lower() or opt.lower() in q_term.lower()]
-                                    target_opt = valid_opt[0] if valid_opt else de.options[0]
-                                    wiki_summary = wikipedia.summary(target_opt, sentences=2, auto_suggest=False)
-                                    if wiki_summary: break
-                                except Exception:
-                                    pass
-                            except Exception:
-                                pass
+            # Execute Multi-AI Fallback Engine (Gemini -> Claude -> OpenAI -> Ollama -> Offline)
+            ai_res = await generateAIResponse(
+                userMessage=user_msg,
+                conversationHistory=session["context"],
+                imageBase64=req.image_base64,
+                systemInstruction=sys_inst,
+                customKeys=custom_keys_dict,
+                providerConfigs=req.provider_configs
+            )
 
-                            if not wiki_summary:
-                                try:
-                                    search_results = wikipedia.search(q_term)
-                                    if search_results:
-                                        try:
-                                            wiki_summary = wikipedia.summary(search_results[0], sentences=2, auto_suggest=False)
-                                            if wiki_summary: break
-                                        except wikipedia.exceptions.DisambiguationError as de2:
-                                            wiki_summary = wikipedia.summary(de2.options[0], sentences=2, auto_suggest=False)
-                                            if wiki_summary: break
-                                except Exception:
-                                    pass
-
-                        if wiki_summary and len(wiki_summary.strip()) > 20:
-                            if api_status == "offline":
-                                reply_text = f"⚠️ [Notice: Gemini AI limit reached on live models. Operating in Offline Knowledge Engine]\n\nAccording to Wikipedia:\n{wiki_summary}"
-                            else:
-                                reply_text = f"According to Wikipedia:\n{wiki_summary}"
-                        else:
-                            reply_text = "Sir, Gemini AI limit reached or offline. Operating in offline predefined command mode! Please add a new API key in Settings."
-                    except Exception as w_err:
-                        print(f"[Offline Wiki Search Fail] {w_err}")
-                        reply_text = "Sir, Gemini AI limit reached or offline. Operating in offline predefined command mode! Please add a new API key in Settings."
+            reply_text = ai_res.get("response", "")
+            provider_used = ai_res.get("provider", "offline")
+            api_status = "online" if provider_used != "offline" else "offline"
+        else:
+            api_status = "online"
 
         # Record context & assistant reply
         session["context"].append({"role": "user", "content": user_msg})
@@ -1084,6 +1002,7 @@ async def process_chat(req: ChatRequest):
 
         return {
             "reply": reply_text,
+            "provider": provider_used,
             "action_url": action_url,
             "api_status": api_status,
             "timestamp": timestamp,

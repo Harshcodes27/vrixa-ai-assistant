@@ -857,10 +857,9 @@
             <div class="setting-item row">
                 <label>AI Model</label>
                 <select id="modelSelect">
-                    <option value="gemini-3.5-flash" selected>gemini-3.5-flash (Fast & Accurate)</option>
-                    <option value="gemini-3.6-flash">gemini-3.6-flash (Advanced Multimodal)</option>
+                    <option value="gemini-3.6-flash" selected>gemini-3.6-flash (Fast & Advanced Multimodal)</option>
+                    <option value="gemini-3.5-flash">gemini-3.5-flash</option>
                     <option value="gemini-3.7-flash">gemini-3.7-flash</option>
-                    <option value="gemini-flash-latest">gemini-flash-latest</option>
                 </select>
             </div>
             <div class="setting-item">
@@ -1125,7 +1124,7 @@
             // Render user message bubble immediately
             addBubble(msg || "Analyze this image", 'user', null, sentImage);
 
-            const model = document.getElementById('modelSelect') ? document.getElementById('modelSelect').value : "gemini-3.5-flash";
+            const model = document.getElementById('modelSelect') ? document.getElementById('modelSelect').value : "gemini-3.6-flash";
             const apiKey = document.getElementById('apiKeyInput') ? document.getElementById('apiKeyInput').value.trim() : "";
 
             // Instant typing indicator

@@ -3,6 +3,7 @@ import re
 import json
 import random
 import datetime
+import asyncio
 import urllib.request
 import urllib.parse
 import subprocess
@@ -598,6 +599,23 @@ async def process_chat(req: ChatRequest):
                     f_lines = [f"• {f['name']}" for f in friends_data.values()]
                     reply_text = "👥 **Your Close Friends (Harsh)**:\n\n" + "\n".join(f_lines)
             
+            # Fast Instant Greetings (<1ms Zero Network Latency)
+            elif text_lower in ["hi", "hello", "hey", "hii", "heyy", "namaste", "hola", "sup"]:
+                greetings = [
+                    "Hello Harsh! Kaise hain aap? Batayein aaj main aapki kya madad kar sakti hoon? 🌸",
+                    "Hey Harsh! Main bilkul ready hoon, batayein kya command hai! ⚡",
+                    "Hello Harsh! All systems active and nominal. How can I assist you today? 🚀"
+                ]
+                reply_text = random.choice(greetings)
+            elif any(text_lower == w for w in ["kaise ho", "kya haal hai", "kya hal hai", "kya chal raha hai", "how are you", "sab kaisa hai"]):
+                reply_text = "Main bilkul badhiya hoon Harsh! Aap batayein, sab kaisa chal raha hai? 😊"
+            elif any(text_lower == w for w in ["good morning", "shubh prabhat"]):
+                reply_text = "Good Morning Harsh! 🌅 Have a wonderful, productive day ahead! Aaj kya plan hai?"
+            elif any(text_lower == w for w in ["good night", "shubh ratri"]):
+                reply_text = "Good Night Harsh! 🌙 Sweet dreams and rest well. Kal baat karte hain!"
+            elif any(text_lower == w for w in ["thank you", "thanks", "dhanyawad", "shukriya", "thank u"]):
+                reply_text = "You're most welcome, Harsh! Hamesha aapki service mein hazir hoon. 🌸⚡"
+
             # 2. Harsh Personal Queries (Clean, Natural & Conversational)
             elif any(w in text_lower for w in ["m kon hu", "mai kon hu", "mein kaun hu", "who am i", "kya karta hu", "kya krta hu"]):
                 reply_text = "Aap **Harsh** hain — ek **Software Engineer** aur B.Tech Computer Science student (NGF College, Palwal). Aap programming aur AI systems build karte hain, aur aapne hi mujhe (VRIXA) create kiya hai!"
@@ -924,26 +942,28 @@ async def process_chat(req: ChatRequest):
                 gemini_contents = [pil_image, "\n".join(convo_history)] if pil_image else "\n".join(convo_history)
 
                 response = None
-                models_to_try = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"]
-                if req.model and req.model not in models_to_try:
-                    models_to_try.insert(0, req.model)
+                models_to_try = ["gemini-3.6-flash", "gemini-3.5-flash"]
+                if req.model and req.model in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.7-flash"]:
+                    if req.model not in models_to_try:
+                        models_to_try.insert(0, req.model)
 
                 for m_name in models_to_try:
                     try:
-                        resp = active_client.models.generate_content(
+                        resp = await asyncio.to_thread(
+                            active_client.models.generate_content,
                             model=m_name,
                             contents=gemini_contents,
                             config=types.GenerateContentConfig(
                                 system_instruction=sys_inst,
-                                max_output_tokens=800,
-                                temperature=0.7
+                                max_output_tokens=180,
+                                temperature=0.6
                             )
                         )
                         if resp and hasattr(resp, 'text') and resp.text:
                             response = resp
                             break
                     except Exception as try_err:
-                        print(f"[Model Retry {m_name}] {try_err}")
+                        print(f"[Fast Model Failover {m_name}] {try_err}")
 
                 if response and hasattr(response, 'text') and response.text:
                     reply_text = response.text.strip()

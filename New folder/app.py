@@ -645,22 +645,27 @@ async def process_chat(req: ChatRequest):
                     f_lines = [f"• {f['name']}" for f in friends_data.values()]
                     reply_text = "👥 **Your Close Friends (Harsh)**:\n\n" + "\n".join(f_lines)
             
-            # Fast Instant Greetings (<1ms Zero Network Latency)
-            elif text_lower in ["hi", "hello", "hey", "hii", "heyy", "namaste", "hola", "sup"]:
+            # Fast Instant Greetings & Chit-Chat (<1ms Zero Network Latency)
+            greeting_words = {"hi", "hello", "hey", "hii", "heyy", "hlo", "hlw", "hloo", "helo", "hy", "namaste", "hola", "sup", "yo", "vrixa", "jarvis"}
+            msg_tokens = set(re.findall(r'\w+', text_lower))
+            
+            if (msg_tokens and msg_tokens.issubset(greeting_words)) or text_lower in ["hi vrixa", "hello vrixa", "hey vrixa", "hlo vrixa", "hlw vrixa"]:
                 greetings = [
                     "Hello Harsh! Kaise hain aap? Batayein aaj main aapki kya madad kar sakti hoon? 🌸",
                     "Hey Harsh! Main bilkul ready hoon, batayein kya command hai! ⚡",
                     "Hello Harsh! All systems active and nominal. How can I assist you today? 🚀"
                 ]
                 reply_text = random.choice(greetings)
-            elif any(text_lower == w for w in ["kaise ho", "kya haal hai", "kya hal hai", "kya chal raha hai", "how are you", "sab kaisa hai"]):
-                reply_text = "Main bilkul badhiya hoon Harsh! Aap batayein, sab kaisa chal raha hai? 😊"
-            elif any(text_lower == w for w in ["good morning", "shubh prabhat"]):
+            elif any(w in text_lower for w in ["kaise ho", "kese ho", "kya haal", "kya hal", "kya chal raha", "kya chal rha", "how are you", "sab kaisa hai", "kya kar rahe", "kya kr rhe", "kya kar rhi"]):
+                reply_text = "Main bilkul badhiya hoon Harsh! Aapke commands ka wait kar rahi hoon. Batayein aaj kya karna hai? 😊⚡"
+            elif any(w in text_lower for w in ["good morning", "shubh prabhat"]):
                 reply_text = "Good Morning Harsh! 🌅 Have a wonderful, productive day ahead! Aaj kya plan hai?"
-            elif any(text_lower == w for w in ["good night", "shubh ratri"]):
+            elif any(w in text_lower for w in ["good night", "shubh ratri"]):
                 reply_text = "Good Night Harsh! 🌙 Sweet dreams and rest well. Kal baat karte hain!"
-            elif any(text_lower == w for w in ["thank you", "thanks", "dhanyawad", "shukriya", "thank u"]):
+            elif any(w in text_lower for w in ["thank you", "thanks", "dhanyawad", "shukriya", "thank u"]):
                 reply_text = "You're most welcome, Harsh! Hamesha aapki service mein hazir hoon. 🌸⚡"
+            elif any(w in text_lower for w in ["suno", "sun", "sunna", "bol", "bolo", "bhai", "bro"]) and len(text_lower.split()) <= 3:
+                reply_text = "Haan Harsh, sun rahi hoon! Batayein kya baat hai? ⚡"
 
             # Instant Date & Time (<1ms)
             elif any(w in text_lower for w in ["what time", "current time", "time kya", "kitne baje", "kya time"]):

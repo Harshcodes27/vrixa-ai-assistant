@@ -150,8 +150,22 @@ class GeminiProvider(BaseAIProvider):
         model: Optional[str] = None
     ) -> ProviderResponse:
         start = time.time()
-        api_key = self.get_api_key(custom_key)
-        if not api_key:
+        import re
+
+        # Collect all configured Gemini keys
+        raw_keys = []
+        if custom_key and custom_key.strip():
+            raw_keys.extend([k.strip() for k in re.split(r'[,;\n]+', custom_key) if k.strip()])
+        env_key = os.environ.get("GEMINI_API_KEY", "")
+        if env_key and env_key.strip():
+            raw_keys.extend([k.strip() for k in re.split(r'[,;\n]+', env_key) if k.strip()])
+        env_keys = os.environ.get("GEMINI_API_KEYS", "")
+        if env_keys and env_keys.strip():
+            raw_keys.extend([k.strip() for k in re.split(r'[,;\n]+', env_keys) if k.strip()])
+        
+        # Deduplicate keys while maintaining order
+        keys_to_try = list(dict.fromkeys(raw_keys))
+        if not keys_to_try:
             return ProviderResponse(
                 success=False,
                 provider=self.provider_id,
@@ -189,54 +203,55 @@ class GeminiProvider(BaseAIProvider):
         last_error_type = "UNKNOWN_ERROR"
         last_error_msg = ""
 
-        for m_name in target_models:
-            try:
-                client = genai.Client(api_key=api_key)
-                cfg = types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    max_output_tokens=1024,
-                    temperature=0.7
-                )
-                
-                resp = await asyncio.wait_for(
-                    asyncio.to_thread(
-                        client.models.generate_content,
-                        model=m_name,
-                        contents=gemini_contents,
-                        config=cfg
-                    ),
-                    timeout=self.timeout_seconds
-                )
-
-                if resp and hasattr(resp, 'text') and resp.text:
-                    elapsed_ms = round((time.time() - start) * 1000, 1)
-                    return ProviderResponse(
-                        success=True,
-                        provider=self.provider_id,
-                        response=resp.text.strip(),
-                        model=m_name,
-                        response_time_ms=elapsed_ms
+        for key_idx, current_key in enumerate(keys_to_try):
+            for m_name in target_models:
+                try:
+                    client = genai.Client(api_key=current_key)
+                    cfg = types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        max_output_tokens=1024,
+                        temperature=0.7
                     )
-            except asyncio.TimeoutError:
-                last_error_type = "TIMEOUT"
-                last_error_msg = f"Gemini model {m_name} timed out after {self.timeout_seconds}s"
-                logger.warning(f"[Gemini] {last_error_msg}")
-            except Exception as e:
-                err_str = str(e)
-                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
-                    last_error_type = "QUOTA_EXCEEDED"
-                    last_error_msg = f"Gemini rate limit/quota reached on {m_name}"
-                elif "401" in err_str or "API_KEY_INVALID" in err_str:
-                    last_error_type = "AUTH_ERROR"
-                    last_error_msg = "Invalid Gemini API Key"
-                    break
-                elif "503" in err_str or "UNAVAILABLE" in err_str:
-                    last_error_type = "SERVER_ERROR"
-                    last_error_msg = f"Gemini {m_name} temporarily unavailable"
-                else:
-                    last_error_type = "API_ERROR"
-                    last_error_msg = err_str[:120]
-                logger.warning(f"[Gemini] Model {m_name} failed: {last_error_msg}")
+                    
+                    resp = await asyncio.wait_for(
+                        asyncio.to_thread(
+                            client.models.generate_content,
+                            model=m_name,
+                            contents=gemini_contents,
+                            config=cfg
+                        ),
+                        timeout=self.timeout_seconds
+                    )
+
+                    if resp and hasattr(resp, 'text') and resp.text:
+                        elapsed_ms = round((time.time() - start) * 1000, 1)
+                        return ProviderResponse(
+                            success=True,
+                            provider=self.provider_id,
+                            response=resp.text.strip(),
+                            model=m_name,
+                            response_time_ms=elapsed_ms
+                        )
+                except asyncio.TimeoutError:
+                    last_error_type = "TIMEOUT"
+                    last_error_msg = f"Gemini model {m_name} timed out after {self.timeout_seconds}s"
+                    logger.warning(f"[Gemini] {last_error_msg}")
+                except Exception as e:
+                    err_str = str(e)
+                    if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+                        last_error_type = "QUOTA_EXCEEDED"
+                        last_error_msg = f"Gemini quota reached on key #{key_idx+1} ({m_name})"
+                    elif "401" in err_str or "API_KEY_INVALID" in err_str:
+                        last_error_type = "AUTH_ERROR"
+                        last_error_msg = f"Invalid Gemini API Key #{key_idx+1}"
+                        break
+                    elif "503" in err_str or "UNAVAILABLE" in err_str:
+                        last_error_type = "SERVER_ERROR"
+                        last_error_msg = f"Gemini {m_name} temporarily unavailable"
+                    else:
+                        last_error_type = "API_ERROR"
+                        last_error_msg = err_str[:120]
+                    logger.warning(f"[Gemini] {last_error_msg}")
 
         elapsed_ms = round((time.time() - start) * 1000, 1)
         return ProviderResponse(
@@ -661,7 +676,37 @@ class OfflineProvider(BaseAIProvider):
         start = time.time()
         import wikipedia
         import re
+        import random
         
+        prompt_clean = prompt.strip()
+        prompt_lower = prompt_clean.lower()
+        
+        # 1. Direct Conversational / Greeting handler (NEVER send to Wikipedia!)
+        greeting_words = {"hi", "hello", "hey", "hii", "heyy", "hlo", "hlw", "hloo", "helo", "hy", "namaste", "hola", "sup", "yo", "vrixa", "jarvis", "suno", "sun", "bol", "bolo", "bhai", "bro", "ok", "acha", "theek", "hmm"}
+        prompt_tokens = set(re.findall(r'\w+', prompt_lower))
+
+        is_conversational = (
+            (prompt_tokens and prompt_tokens.issubset(greeting_words)) or
+            any(w in prompt_lower for w in ["kaise ho", "kese ho", "kya haal", "kya hal", "kya chal raha", "kya chal rha", "kya kr rhe", "how are you", "who are you", "kon ho", "kaun ho", "kya kar sakti", "kya kr sakti"]) or
+            len(prompt_lower) <= 3
+        )
+
+        if is_conversational:
+            greetings = [
+                "Hello Harsh! Main sun rahi hoon. Batayein aaj main aapki kya madad kar sakti hoon? 🌸⚡",
+                "Hey Harsh! Main bilkul ready hoon, batayein kya command hai! ⚡",
+                "Main bilkul theek hoon Harsh! Batayein, kya command hai aapka? 😊"
+            ]
+            elapsed_ms = round((time.time() - start) * 1000, 1)
+            return ProviderResponse(
+                success=True,
+                provider=self.provider_id,
+                response=random.choice(greetings),
+                model=self.default_model,
+                response_time_ms=elapsed_ms
+            )
+
+        # 2. Informational Wikipedia Search for real topics
         stops = [
             r'\b(ke|ki|ka|ko|se|me|par|bhi|hi|pe|ne)\b',
             r'\b(barme|bare|baare|batao|bato|bataye|bataiye|bata|janana|jaanna|dikhaye|dikhao)\b',
@@ -670,26 +715,27 @@ class OfflineProvider(BaseAIProvider):
             r'\b(krte|krne|karna|karne|krna|karwa|karwane|karo|kare|hote|hota|hoti|karte|karta|karti|do|doing|make|use|used)\b',
             r'\b(sir|please|plz|bhai|bro|vrixa|jarvis|ok)\b'
         ]
-        cleaned_topic = prompt
+        cleaned_topic = prompt_clean
         for pat in stops:
             cleaned_topic = re.sub(pat, '', cleaned_topic, flags=re.IGNORECASE)
         cleaned_topic = re.sub(r'\s+', ' ', cleaned_topic).strip()
-        search_q = cleaned_topic if len(cleaned_topic) >= 2 else prompt
+        search_q = cleaned_topic if len(cleaned_topic) >= 4 else prompt_clean
 
         wiki_summary = None
-        try:
-            wiki_summary = wikipedia.summary(search_q, sentences=2, auto_suggest=False)
-        except Exception:
+        if len(search_q) >= 4:
             try:
-                results = wikipedia.search(search_q)
-                if results:
-                    wiki_summary = wikipedia.summary(results[0], sentences=2, auto_suggest=False)
+                wiki_summary = wikipedia.summary(search_q, sentences=2, auto_suggest=False)
             except Exception:
-                pass
+                try:
+                    results = wikipedia.search(search_q)
+                    if results:
+                        wiki_summary = wikipedia.summary(results[0], sentences=2, auto_suggest=False)
+                except Exception:
+                    pass
 
         elapsed_ms = round((time.time() - start) * 1000, 1)
-        if wiki_summary and len(wiki_summary.strip()) > 15:
-            reply = f"⚠️ *[All live AI services are currently unavailable. Operating in offline knowledge mode]*\n\n📚 **According to Wikipedia**:\n{wiki_summary}"
+        if wiki_summary and len(wiki_summary.strip()) > 20:
+            reply = f"📚 **According to Wikipedia**:\n{wiki_summary}"
             return ProviderResponse(
                 success=True,
                 provider=self.provider_id,
@@ -698,7 +744,7 @@ class OfflineProvider(BaseAIProvider):
                 response_time_ms=elapsed_ms
             )
         else:
-            reply = "⚠️ All live AI services are currently unavailable. I am operating in offline mode. Please check your internet connection or configure an API key in Settings."
+            reply = "Main aapki baat samajh rahi hoon, Harsh! Cloud AI quota abhi reset ho raha hai. Aap koi direct fact/topic pooch sakte hain ya **⚙ Settings** mein nayi free API Key add kar sakte hain! ⚡"
             return ProviderResponse(
                 success=True,
                 provider=self.provider_id,

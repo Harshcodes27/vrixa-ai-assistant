@@ -616,6 +616,30 @@ async def process_chat(req: ChatRequest):
             elif any(text_lower == w for w in ["thank you", "thanks", "dhanyawad", "shukriya", "thank u"]):
                 reply_text = "You're most welcome, Harsh! Hamesha aapki service mein hazir hoon. 🌸⚡"
 
+            # Instant Date & Time (<1ms)
+            elif any(w in text_lower for w in ["what time", "current time", "time kya", "kitne baje", "kya time"]):
+                curr_t = get_ist_now().strftime("%I:%M:%S %p")
+                reply_text = f"⏰ Abhi **{curr_t}** (IST) ho rahe hain, Harsh."
+            elif any(w in text_lower for w in ["what date", "aaj ki date", "aaj konsi date", "aaj konsa din", "today date", "which day"]):
+                curr_d = get_ist_now().strftime("%A, %d %B %Y")
+                reply_text = f"📅 Aaj **{curr_d}** hai, Harsh."
+
+            # Instant Jokes & Quotes (<1ms)
+            elif any(w in text_lower for w in ["tell me a joke", "joke sunao", "chutkula", "hasao", "koi joke"]):
+                jokes = [
+                    "Teacher: Kal school kyu nahi aaye? \nPappu: Mam kal sapne mein America chala gaya tha. \nTeacher: Toh Bunty tu kyu nahi aaya? \nBunty: Mam main Pappu ko airport chhodne gaya tha! 😂",
+                    "Ek programmer ka beta: Papa, sun east se kyu nikalta hai aur west me kyu doobta hai? \nPapa: Beta, jo code bina bug ke chal raha ho, use chhedte nahi! 💻🤣",
+                    "Doctor: Aapko aaraam ki sakht zaroorat hai, yeh neend ki goliyaan apni biwi ko de dena! 😅"
+                ]
+                reply_text = f"😄 **Joke for you**:\n\n{random.choice(jokes)}"
+            elif any(w in text_lower for w in ["motivate", "motivation", "motivational quote", "inspire", "thought of the day", "suvichar"]):
+                quotes = [
+                    "\"The secret of getting ahead is getting started.\" — Mark Twain 🚀",
+                    "\"Success is not final, failure is not fatal: it is the courage to continue that counts.\" — Winston Churchill ⚡",
+                    "\"Great things are not done by impulse, but by a series of small things brought together.\" — Vincent Van Gogh 🌟"
+                ]
+                reply_text = f"✨ **Motivation for you, Harsh**:\n\n{random.choice(quotes)}"
+
             # 2. Harsh Personal Queries (Clean, Natural & Conversational)
             elif any(w in text_lower for w in ["m kon hu", "mai kon hu", "mein kaun hu", "who am i", "kya karta hu", "kya krta hu"]):
                 reply_text = "Aap **Harsh** hain — ek **Software Engineer** aur B.Tech Computer Science student (NGF College, Palwal). Aap programming aur AI systems build karte hain, aur aapne hi mujhe (VRIXA) create kiya hai!"
@@ -908,17 +932,10 @@ async def process_chat(req: ChatRequest):
 
         if not reply_text and active_client:
             try:
-                now_str = get_ist_now().strftime("%A, %B %d, %Y (%I:%M %p)")
+                now_str = get_ist_now().strftime("%A, %I:%M %p")
                 sys_inst = (
-                    f"You are VRIXA — an intelligent, versatile, all-purpose AI Assistant created by Harsh.\n"
-                    f"Current Date & Time: {now_str}.\n"
-                    "CRITICAL CONVERSATIONAL RULES:\n"
-                    "1. NATURAL GREETINGS: For casual greetings (like 'hi', 'hello', 'kya haal hai', 'sup'), respond naturally, warmly, and crisply (e.g. 'Hello Harsh! Kaise hain aap? Batayein aaj main aapki kya madad kar sakti hoon?').\n"
-                    "2. NO FORCED ASSUMPTIONS: NEVER assume or blurt out that the user wants to do a 'B.Tech CSE coding project' or 'handle tasks' during normal greetings! Never mention college, degree, or tasks unless Harsh specifically asks about them.\n"
-                    "3. VERSATILITY: You are an all-round intelligent assistant for any topic (answering questions, chatting, facts, distance, calculations, general knowledge, entertainment, etc.).\n"
-                    "4. USER ADDRESS: Address him casually and respectfully as 'Harsh' (Never 'Mr. Harsh', never 'Sir').\n"
-                    "5. LANGUAGE & BREVITY: Match user language (Hinglish or English) naturally. Keep responses crisp (1-3 sentences), direct, helpful, with relevant emojis.\n"
-                    "6. CREATOR INFO (Only when explicitly asked 'who am i', 'meri info', 'owner'): Harsh (Roll No: 23035004049, DOB: 27 September 2005, NGF College Palwal).\n"
+                    f"You are VRIXA, an intelligent and fast AI assistant created by Harsh. Current time: {now_str}. "
+                    "Rules: 1. Be natural, warm, and direct. 2. Match language (Hinglish/English). 3. Keep responses crisp (1-3 sentences) with relevant emojis. 4. Never give long lectures unless asked."
                 )
                 
                 pil_image = None
@@ -931,12 +948,12 @@ async def process_chat(req: ChatRequest):
                         print(f"[Image Decode Error] {img_e}")
 
                 convo_history = []
-                recent_turns = session["context"][-10:]
+                recent_turns = session["context"][-3:]
                 for turn in recent_turns:
                     role_str = "User" if turn["role"] == "user" else "Vrixa"
                     convo_history.append(f"{role_str}: {turn['content']}")
                 
-                v_prompt = user_msg if user_msg and user_msg.strip() != "" else "Analyze this image in detail and explain everything you see."
+                v_prompt = user_msg if user_msg and user_msg.strip() != "" else "Analyze this image in detail."
                 convo_history.append(f"User: {v_prompt}\nVrixa:")
 
                 gemini_contents = [pil_image, "\n".join(convo_history)] if pil_image else "\n".join(convo_history)

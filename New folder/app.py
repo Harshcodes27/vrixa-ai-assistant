@@ -418,6 +418,10 @@ class ChatRequest(BaseModel):
     api_key: str | None = None
     image_base64: str | None = None
 
+@app.get("/api/ping")
+async def ping_alive():
+    return {"status": "alive", "timestamp": get_ist_now().isoformat()}
+
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")

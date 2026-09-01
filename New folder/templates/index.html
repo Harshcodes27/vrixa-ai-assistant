@@ -550,6 +550,7 @@
             margin-right: 6px;
         }
         .tag-gemini { background: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .tag-groq { background: rgba(249, 115, 22, 0.2); color: #FB923C; border: 1px solid rgba(249, 115, 22, 0.3); }
         .tag-claude { background: rgba(217, 119, 6, 0.2); color: #FBBF24; border: 1px solid rgba(217, 119, 6, 0.3); }
         .tag-openai { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
         .tag-ollama { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.3); }
@@ -1255,12 +1256,40 @@
                 </div>
             </div>
 
-            <!-- 2. Anthropic Claude Provider Card -->
+            <!-- 2. Groq Cloud Provider Card (Ultra-Fast Free Llama 3) -->
+            <div class="provider-card" id="cardGroq">
+                <div class="provider-card-header">
+                    <div class="provider-name">
+                        <input type="checkbox" id="groqToggle" checked style="accent-color: #F97316;">
+                        <span>⚡ 2. Groq Cloud <span style="font-size: 10px; color: #FB923C;">(Ultra-Fast Llama 3)</span></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span class="provider-badge" id="badgeGroq">⚪ Free Key</span>
+                        <button type="button" class="btn-test-prov" onclick="testProvider('groq')">🧪 Test</button>
+                    </div>
+                </div>
+                <div class="provider-fields">
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Model</small>
+                        <select id="groqModel" class="provider-input">
+                            <option value="llama-3.3-70b-versatile" selected>llama-3.3-70b</option>
+                            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+                            <option value="mixtral-8x7b-32768">mixtral-8x7b</option>
+                        </select>
+                    </div>
+                    <div>
+                        <small style="color: #64748B; font-size: 10px;">Free Groq API Key (gsk_...)</small>
+                        <input type="password" id="groqKey" class="provider-input" placeholder="gsk_..." autocomplete="new-password">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Anthropic Claude Provider Card -->
             <div class="provider-card" id="cardClaude">
                 <div class="provider-card-header">
                     <div class="provider-name">
                         <input type="checkbox" id="claudeToggle" checked style="accent-color: #D97706;">
-                        <span>🟠 2. Anthropic Claude <span style="font-size: 10px; color: #FBBF24;">(1st Fallback)</span></span>
+                        <span>🟠 3. Anthropic Claude <span style="font-size: 10px; color: #FBBF24;">(2nd Fallback)</span></span>
                     </div>
                     <div style="display: flex; gap: 6px; align-items: center;">
                         <span class="provider-badge" id="badgeClaude">⚪ Standby</span>
@@ -1282,12 +1311,12 @@
                 </div>
             </div>
 
-            <!-- 3. OpenAI Provider Card -->
+            <!-- 4. OpenAI Provider Card -->
             <div class="provider-card" id="cardOpenAI">
                 <div class="provider-card-header">
                     <div class="provider-name">
                         <input type="checkbox" id="openaiToggle" checked style="accent-color: #10B981;">
-                        <span>🟢 3. OpenAI <span style="font-size: 10px; color: #34D399;">(2nd Fallback)</span></span>
+                        <span>🟢 4. OpenAI <span style="font-size: 10px; color: #34D399;">(3rd Fallback)</span></span>
                     </div>
                     <div style="display: flex; gap: 6px; align-items: center;">
                         <span class="provider-badge" id="badgeOpenAI">⚪ Standby</span>
@@ -1309,15 +1338,18 @@
                 </div>
             </div>
 
-            <!-- 4. Local Ollama Provider Card -->
+            <!-- 5. Local Ollama Provider Card -->
             <div class="provider-card" id="cardOllama">
                 <div class="provider-card-header">
                     <div class="provider-name">
                         <input type="checkbox" id="ollamaToggle" checked style="accent-color: #8B5CF6;">
-                        <span>🟣 4. Local Ollama <span style="font-size: 10px; color: #C084FC;">(Local AI)</span></span>
+                        <span>🟣 5. Local Ollama <span style="font-size: 10px; color: #C084FC;">(Local AI)</span></span>
                     </div>
                     <div style="display: flex; gap: 6px; align-items: center;">
                         <span class="provider-badge" id="badgeOllama">⚪ Local Daemon</span>
+                        <button type="button" class="btn-test-prov" onclick="testProvider('ollama')">🧪 Test</button>
+                    </div>
+                </div>
                         <button type="button" class="btn-test-prov" onclick="testProvider('ollama')">🧪 Test</button>
                     </div>
                 </div>
@@ -1353,11 +1385,13 @@
         function loadProviderSettings() {
             // Keys
             if (localStorage.getItem('vrixa_key_gemini')) document.getElementById('geminiKey').value = localStorage.getItem('vrixa_key_gemini');
+            if (localStorage.getItem('vrixa_key_groq')) document.getElementById('groqKey').value = localStorage.getItem('vrixa_key_groq');
             if (localStorage.getItem('vrixa_key_claude')) document.getElementById('claudeKey').value = localStorage.getItem('vrixa_key_claude');
             if (localStorage.getItem('vrixa_key_openai')) document.getElementById('openaiKey').value = localStorage.getItem('vrixa_key_openai');
             
             // Models & URLs
             if (localStorage.getItem('vrixa_model_gemini')) document.getElementById('geminiModel').value = localStorage.getItem('vrixa_model_gemini');
+            if (localStorage.getItem('vrixa_model_groq')) document.getElementById('groqModel').value = localStorage.getItem('vrixa_model_groq');
             if (localStorage.getItem('vrixa_model_claude')) document.getElementById('claudeModel').value = localStorage.getItem('vrixa_model_claude');
             if (localStorage.getItem('vrixa_model_openai')) document.getElementById('openaiModel').value = localStorage.getItem('vrixa_model_openai');
             if (localStorage.getItem('vrixa_model_ollama')) document.getElementById('ollamaModel').value = localStorage.getItem('vrixa_model_ollama');
@@ -1365,6 +1399,7 @@
 
             // Toggles
             if (localStorage.getItem('vrixa_toggle_gemini') !== null) document.getElementById('geminiToggle').checked = localStorage.getItem('vrixa_toggle_gemini') === 'true';
+            if (localStorage.getItem('vrixa_toggle_groq') !== null) document.getElementById('groqToggle').checked = localStorage.getItem('vrixa_toggle_groq') === 'true';
             if (localStorage.getItem('vrixa_toggle_claude') !== null) document.getElementById('claudeToggle').checked = localStorage.getItem('vrixa_toggle_claude') === 'true';
             if (localStorage.getItem('vrixa_toggle_openai') !== null) document.getElementById('openaiToggle').checked = localStorage.getItem('vrixa_toggle_openai') === 'true';
             if (localStorage.getItem('vrixa_toggle_ollama') !== null) document.getElementById('ollamaToggle').checked = localStorage.getItem('vrixa_toggle_ollama') === 'true';
@@ -1399,10 +1434,12 @@
             }
 
             const apiKey = providerId === 'gemini' ? document.getElementById('geminiKey').value.trim() :
+                           providerId === 'groq' ? document.getElementById('groqKey').value.trim() :
                            providerId === 'claude' ? document.getElementById('claudeKey').value.trim() :
                            providerId === 'openai' ? document.getElementById('openaiKey').value.trim() : '';
 
             const model = providerId === 'gemini' ? document.getElementById('geminiModel').value :
+                          providerId === 'groq' ? document.getElementById('groqModel').value :
                           providerId === 'claude' ? document.getElementById('claudeModel').value :
                           providerId === 'openai' ? document.getElementById('openaiModel').value :
                           document.getElementById('ollamaModel').value;
@@ -1656,6 +1693,7 @@
             if (sender === 'bot' && provider) {
                 const pClass = `tag-${provider.toLowerCase()}`;
                 const pName = provider === 'gemini' ? 'Gemini' :
+                              provider === 'groq' ? 'Groq (Llama 3)' :
                               provider === 'claude' ? 'Claude' :
                               provider === 'openai' ? 'OpenAI' :
                               provider === 'ollama' ? 'Ollama' : 'Offline Engine';
@@ -1705,6 +1743,7 @@
 
             const customKeys = {
                 gemini: document.getElementById('geminiKey') ? document.getElementById('geminiKey').value.trim() : (localStorage.getItem('vrixa_key_gemini') || ''),
+                groq: document.getElementById('groqKey') ? document.getElementById('groqKey').value.trim() : (localStorage.getItem('vrixa_key_groq') || ''),
                 claude: document.getElementById('claudeKey') ? document.getElementById('claudeKey').value.trim() : (localStorage.getItem('vrixa_key_claude') || ''),
                 openai: document.getElementById('openaiKey') ? document.getElementById('openaiKey').value.trim() : (localStorage.getItem('vrixa_key_openai') || '')
             };
@@ -1713,6 +1752,10 @@
                 gemini: {
                     enabled: document.getElementById('geminiToggle') ? document.getElementById('geminiToggle').checked : true,
                     model: document.getElementById('geminiModel') ? document.getElementById('geminiModel').value : 'gemini-3.6-flash'
+                },
+                groq: {
+                    enabled: document.getElementById('groqToggle') ? document.getElementById('groqToggle').checked : true,
+                    model: document.getElementById('groqModel') ? document.getElementById('groqModel').value : 'llama-3.3-70b-versatile'
                 },
                 claude: {
                     enabled: document.getElementById('claudeToggle') ? document.getElementById('claudeToggle').checked : true,
@@ -1847,15 +1890,18 @@
         function saveSettings() {
             // Save Keys
             const gKey = document.getElementById('geminiKey') ? document.getElementById('geminiKey').value.trim() : '';
+            const groqKey = document.getElementById('groqKey') ? document.getElementById('groqKey').value.trim() : '';
             const cKey = document.getElementById('claudeKey') ? document.getElementById('claudeKey').value.trim() : '';
             const oKey = document.getElementById('openaiKey') ? document.getElementById('openaiKey').value.trim() : '';
 
             if (gKey) localStorage.setItem('vrixa_key_gemini', gKey); else localStorage.removeItem('vrixa_key_gemini');
+            if (groqKey) localStorage.setItem('vrixa_key_groq', groqKey); else localStorage.removeItem('vrixa_key_groq');
             if (cKey) localStorage.setItem('vrixa_key_claude', cKey); else localStorage.removeItem('vrixa_key_claude');
             if (oKey) localStorage.setItem('vrixa_key_openai', oKey); else localStorage.removeItem('vrixa_key_openai');
 
             // Save Models
             if (document.getElementById('geminiModel')) localStorage.setItem('vrixa_model_gemini', document.getElementById('geminiModel').value);
+            if (document.getElementById('groqModel')) localStorage.setItem('vrixa_model_groq', document.getElementById('groqModel').value);
             if (document.getElementById('claudeModel')) localStorage.setItem('vrixa_model_claude', document.getElementById('claudeModel').value);
             if (document.getElementById('openaiModel')) localStorage.setItem('vrixa_model_openai', document.getElementById('openaiModel').value);
             if (document.getElementById('ollamaModel')) localStorage.setItem('vrixa_model_ollama', document.getElementById('ollamaModel').value);
@@ -1863,6 +1909,7 @@
 
             // Save Toggles
             if (document.getElementById('geminiToggle')) localStorage.setItem('vrixa_toggle_gemini', document.getElementById('geminiToggle').checked);
+            if (document.getElementById('groqToggle')) localStorage.setItem('vrixa_toggle_groq', document.getElementById('groqToggle').checked);
             if (document.getElementById('claudeToggle')) localStorage.setItem('vrixa_toggle_claude', document.getElementById('claudeToggle').checked);
             if (document.getElementById('openaiToggle')) localStorage.setItem('vrixa_toggle_openai', document.getElementById('openaiToggle').checked);
             if (document.getElementById('ollamaToggle')) localStorage.setItem('vrixa_toggle_ollama', document.getElementById('ollamaToggle').checked);

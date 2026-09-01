@@ -547,11 +547,135 @@ class OpenAIProvider(BaseAIProvider):
             )
 
 # =====================================================================
-# 4. Local Ollama Provider (Final AI Fallback)
+# 4. Groq Provider (Ultra-Fast Cloud Inference)
+# =====================================================================
+class GroqProvider(BaseAIProvider):
+    def __init__(self):
+        super().__init__("groq", "Groq Cloud", 4, "llama-3.3-70b-versatile")
+        self.endpoint = "https://api.groq.com/openai/v1/chat/completions"
+        self.fallback_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+
+    async def generate(
+        self,
+        prompt: str,
+        conversation_history: List[Dict[str, str]],
+        image_base64: Optional[str] = None,
+        system_instruction: Optional[str] = None,
+        custom_key: Optional[str] = None,
+        model: Optional[str] = None
+    ) -> ProviderResponse:
+        start = time.time()
+        api_key = self.get_api_key(custom_key)
+        if not api_key:
+            return ProviderResponse(
+                success=False,
+                provider=self.provider_id,
+                response="",
+                model=model or self.default_model,
+                response_time_ms=0,
+                error_type="NOT_CONFIGURED",
+                error_message="Groq API key is not configured"
+            )
+
+        use_model = model or self.default_model
+        messages = []
+        if system_instruction:
+            messages.append({"role": "system", "content": system_instruction})
+
+        for turn in conversation_history[-4:]:
+            role = "user" if turn.get("role") == "user" else "assistant"
+            content = turn.get("content", "").strip()
+            if content:
+                messages.append({"role": role, "content": content})
+
+        messages.append({"role": "user", "content": prompt or "Hello"})
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": use_model,
+            "messages": messages,
+            "max_tokens": 1024,
+            "temperature": 0.7
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout_seconds) as http_client:
+                res = await http_client.post(self.endpoint, headers=headers, json=payload)
+                elapsed_ms = round((time.time() - start) * 1000, 1)
+
+                if res.status_code == 200:
+                    data = res.json()
+                    choices = data.get("choices", [])
+                    if choices:
+                        reply = choices[0].get("message", {}).get("content", "").strip()
+                        return ProviderResponse(
+                            success=True,
+                            provider=self.provider_id,
+                            response=reply,
+                            model=use_model,
+                            response_time_ms=elapsed_ms
+                        )
+                elif res.status_code == 429:
+                    return ProviderResponse(
+                        success=False,
+                        provider=self.provider_id,
+                        response="",
+                        model=use_model,
+                        response_time_ms=elapsed_ms,
+                        error_type="QUOTA_EXCEEDED",
+                        error_message="Groq rate limit exceeded (429)"
+                    )
+                elif res.status_code == 401:
+                    return ProviderResponse(
+                        success=False,
+                        provider=self.provider_id,
+                        response="",
+                        model=use_model,
+                        response_time_ms=elapsed_ms,
+                        error_type="AUTH_ERROR",
+                        error_message="Invalid Groq API Key (401)"
+                    )
+                else:
+                    return ProviderResponse(
+                        success=False,
+                        provider=self.provider_id,
+                        response="",
+                        model=use_model,
+                        response_time_ms=elapsed_ms,
+                        error_type="SERVER_ERROR",
+                        error_message=f"Groq API Error: HTTP {res.status_code}"
+                    )
+        except httpx.TimeoutException:
+            elapsed_ms = round((time.time() - start) * 1000, 1)
+            return ProviderResponse(
+                success=False,
+                provider=self.provider_id,
+                response="",
+                model=use_model,
+                response_time_ms=elapsed_ms,
+                error_type="TIMEOUT",
+                error_message=f"Groq request timed out after {self.timeout_seconds}s"
+            )
+        except Exception as e:
+            elapsed_ms = round((time.time() - start) * 1000, 1)
+            return ProviderResponse(
+                success=False,
+                provider=self.provider_id,
+                response="",
+                model=use_model,
+                response_time_ms=elapsed_ms,
+                error_type="NETWORK_ERROR",
+                error_message=str(e)[:120]
+            )
+
+# =====================================================================
+# 5. Local Ollama Provider (Final AI Fallback)
 # =====================================================================
 class OllamaProvider(BaseAIProvider):
     def __init__(self):
-        super().__init__("ollama", "Local Ollama", 4, "llama3.2")
+        super().__init__("ollama", "Local Ollama", 5, "llama3.2")
         self.base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
 
     def is_configured(self, custom_key: Optional[str] = None) -> bool:
@@ -760,12 +884,13 @@ class MultiAIOrchestrator:
     def __init__(self):
         self.providers: Dict[str, BaseAIProvider] = {
             "gemini": GeminiProvider(),
+            "groq": GroqProvider(),
             "claude": ClaudeProvider(),
             "openai": OpenAIProvider(),
             "ollama": OllamaProvider(),
             "offline": OfflineProvider()
         }
-        self.priority_order = ["gemini", "claude", "openai", "ollama", "offline"]
+        self.priority_order = ["gemini", "groq", "claude", "openai", "ollama", "offline"]
 
     def get_provider(self, provider_id: str) -> Optional[BaseAIProvider]:
         return self.providers.get(provider_id.lower())

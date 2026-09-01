@@ -434,9 +434,10 @@ class ProviderConfigRequest(BaseModel):
     model: str | None = None
 
 @app.get("/api/providers/status")
-async def get_providers_status(gemini_key: str | None = None, claude_key: str | None = None, openai_key: str | None = None):
+async def get_providers_status(gemini_key: str | None = None, groq_key: str | None = None, claude_key: str | None = None, openai_key: str | None = None):
     custom_keys = {}
     if gemini_key: custom_keys["gemini"] = gemini_key
+    if groq_key: custom_keys["groq"] = groq_key
     if claude_key: custom_keys["claude"] = claude_key
     if openai_key: custom_keys["openai"] = openai_key
     return {"providers": ai_orchestrator.get_providers_status(custom_keys=custom_keys)}

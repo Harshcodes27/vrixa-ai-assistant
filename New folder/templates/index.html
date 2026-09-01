@@ -541,20 +541,21 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 700;
-            padding: 2px 6px;
+            padding: 2px 7px;
             border-radius: 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-right: 6px;
+            margin-right: 8px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.3);
         }
-        .tag-gemini { background: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .tag-groq { background: rgba(249, 115, 22, 0.2); color: #FB923C; border: 1px solid rgba(249, 115, 22, 0.3); }
-        .tag-claude { background: rgba(217, 119, 6, 0.2); color: #FBBF24; border: 1px solid rgba(217, 119, 6, 0.3); }
-        .tag-openai { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .tag-ollama { background: rgba(168, 85, 247, 0.2); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.3); }
-        .tag-offline { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .tag-gemini { background: rgba(59, 130, 246, 0.18); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.35); }
+        .tag-groq { background: rgba(249, 115, 22, 0.18); color: #FB923C; border: 1px solid rgba(249, 115, 22, 0.35); }
+        .tag-claude { background: rgba(217, 119, 6, 0.18); color: #FBBF24; border: 1px solid rgba(217, 119, 6, 0.35); }
+        .tag-openai { background: rgba(16, 185, 129, 0.18); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.35); }
+        .tag-ollama { background: rgba(168, 85, 247, 0.18); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.35); }
+        .tag-offline { background: rgba(148, 163, 184, 0.15); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.25); }
         .btn-close-modal {
             width: 100%;
             background: linear-gradient(135deg, #1E40AF, #1E3A8A);
@@ -1688,16 +1689,15 @@
             let imageHtml = imageSrc ? `<div style="margin-bottom: 8px;"><img src="${imageSrc}" style="max-width: 260px; max-height: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); object-fit: cover;"></div>` : '';
 
             let providerBadge = '';
-            if (sender === 'bot' && provider && provider !== 'offline') {
-                const pClass = `tag-${provider.toLowerCase()}`;
-                const pName = provider === 'gemini' ? 'Gemini' :
-                              provider === 'groq' ? 'Groq' :
-                              provider === 'claude' ? 'Claude' :
-                              provider === 'openai' ? 'OpenAI' :
-                              provider === 'ollama' ? 'Ollama' : '';
-                if (pName) {
-                    providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
-                }
+            if (sender === 'bot' && provider) {
+                const prov = provider.toLowerCase();
+                const pClass = `tag-${prov}`;
+                const pName = prov === 'gemini' ? 'Google Gemini' :
+                              prov === 'groq' ? 'Groq Cloud' :
+                              prov === 'claude' ? 'Anthropic Claude' :
+                              prov === 'openai' ? 'OpenAI GPT' :
+                              prov === 'ollama' ? 'Local Ollama' : 'Offline Engine';
+                providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
             }
 
             row.innerHTML = `

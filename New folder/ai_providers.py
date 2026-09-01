@@ -551,9 +551,15 @@ class OpenAIProvider(BaseAIProvider):
 # =====================================================================
 class GroqProvider(BaseAIProvider):
     def __init__(self):
-        super().__init__("groq", "Groq Cloud", 4, "llama-3.3-70b-versatile")
+        super().__init__("groq", "Groq Cloud", 4, "openai/gpt-oss-120b")
         self.endpoint = "https://api.groq.com/openai/v1/chat/completions"
-        self.fallback_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+        self.fallback_models = [
+            "openai/gpt-oss-120b",
+            "qwen/qwen3.8-27b",
+            "openai/gpt-oss-20b",
+            "qwen/qwen3.6-27b",
+            "groq/compound-mini"
+        ]
 
     async def generate(
         self,
@@ -577,7 +583,13 @@ class GroqProvider(BaseAIProvider):
                 error_message="Groq API key is not configured"
             )
 
-        use_model = model or self.default_model
+        target_models = list(self.fallback_models)
+        if model and model in target_models:
+            target_models.remove(model)
+            target_models.insert(0, model)
+        elif model:
+            target_models.insert(0, model)
+
         messages = []
         if system_instruction:
             messages.append({"role": "system", "content": system_instruction})
@@ -593,82 +605,70 @@ class GroqProvider(BaseAIProvider):
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
-        payload = {
-            "model": use_model,
-            "messages": messages,
-            "max_tokens": 1024,
-            "temperature": 0.7
-        }
 
-        try:
-            async with httpx.AsyncClient(timeout=self.timeout_seconds) as http_client:
-                res = await http_client.post(self.endpoint, headers=headers, json=payload)
-                elapsed_ms = round((time.time() - start) * 1000, 1)
+        last_error = None
+        for try_model in target_models:
+            payload = {
+                "model": try_model,
+                "messages": messages,
+                "max_tokens": 1024,
+                "temperature": 0.7
+            }
 
-                if res.status_code == 200:
-                    data = res.json()
-                    choices = data.get("choices", [])
-                    if choices:
-                        reply = choices[0].get("message", {}).get("content", "").strip()
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout_seconds) as http_client:
+                    res = await http_client.post(self.endpoint, headers=headers, json=payload)
+                    elapsed_ms = round((time.time() - start) * 1000, 1)
+
+                    if res.status_code == 200:
+                        data = res.json()
+                        choices = data.get("choices", [])
+                        if choices:
+                            reply = choices[0].get("message", {}).get("content", "").strip()
+                            return ProviderResponse(
+                                success=True,
+                                provider=self.provider_id,
+                                response=reply,
+                                model=try_model,
+                                response_time_ms=elapsed_ms
+                            )
+                    elif res.status_code == 429:
+                        last_error = "Groq rate limit exceeded (429)"
+                        continue
+                    elif res.status_code == 401:
                         return ProviderResponse(
-                            success=True,
+                            success=False,
                             provider=self.provider_id,
-                            response=reply,
-                            model=use_model,
-                            response_time_ms=elapsed_ms
+                            response="",
+                            model=try_model,
+                            response_time_ms=elapsed_ms,
+                            error_type="AUTH_ERROR",
+                            error_message="Invalid Groq API Key (401)"
                         )
-                elif res.status_code == 429:
-                    return ProviderResponse(
-                        success=False,
-                        provider=self.provider_id,
-                        response="",
-                        model=use_model,
-                        response_time_ms=elapsed_ms,
-                        error_type="QUOTA_EXCEEDED",
-                        error_message="Groq rate limit exceeded (429)"
-                    )
-                elif res.status_code == 401:
-                    return ProviderResponse(
-                        success=False,
-                        provider=self.provider_id,
-                        response="",
-                        model=use_model,
-                        response_time_ms=elapsed_ms,
-                        error_type="AUTH_ERROR",
-                        error_message="Invalid Groq API Key (401)"
-                    )
-                else:
-                    return ProviderResponse(
-                        success=False,
-                        provider=self.provider_id,
-                        response="",
-                        model=use_model,
-                        response_time_ms=elapsed_ms,
-                        error_type="SERVER_ERROR",
-                        error_message=f"Groq API Error: HTTP {res.status_code}"
-                    )
-        except httpx.TimeoutException:
-            elapsed_ms = round((time.time() - start) * 1000, 1)
-            return ProviderResponse(
-                success=False,
-                provider=self.provider_id,
-                response="",
-                model=use_model,
-                response_time_ms=elapsed_ms,
-                error_type="TIMEOUT",
-                error_message=f"Groq request timed out after {self.timeout_seconds}s"
-            )
-        except Exception as e:
-            elapsed_ms = round((time.time() - start) * 1000, 1)
-            return ProviderResponse(
-                success=False,
-                provider=self.provider_id,
-                response="",
-                model=use_model,
-                response_time_ms=elapsed_ms,
-                error_type="NETWORK_ERROR",
-                error_message=str(e)[:120]
-            )
+                    elif res.status_code == 404:
+                        # Model not available, try next
+                        last_error = f"Model {try_model} not found on Groq"
+                        continue
+                    else:
+                        last_error = f"Groq API Error: HTTP {res.status_code}"
+                        continue
+            except httpx.TimeoutException:
+                last_error = f"Groq request timed out on {try_model}"
+                continue
+            except Exception as e:
+                last_error = str(e)[:120]
+                continue
+
+        elapsed_ms = round((time.time() - start) * 1000, 1)
+        return ProviderResponse(
+            success=False,
+            provider=self.provider_id,
+            response="",
+            model=target_models[0],
+            response_time_ms=elapsed_ms,
+            error_type="API_ERROR",
+            error_message=last_error or "All Groq models failed"
+        )
 
 # =====================================================================
 # 5. Local Ollama Provider (Final AI Fallback)

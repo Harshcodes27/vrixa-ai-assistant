@@ -1687,14 +1687,16 @@
             let imageHtml = imageSrc ? `<div style="margin-bottom: 8px;"><img src="${imageSrc}" style="max-width: 260px; max-height: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); object-fit: cover;"></div>` : '';
 
             let providerBadge = '';
-            if (sender === 'bot' && provider) {
+            if (sender === 'bot' && provider && provider !== 'offline') {
                 const pClass = `tag-${provider.toLowerCase()}`;
                 const pName = provider === 'gemini' ? 'Gemini' :
-                              provider === 'groq' ? 'Groq (Llama 3)' :
+                              provider === 'groq' ? 'Groq' :
                               provider === 'claude' ? 'Claude' :
                               provider === 'openai' ? 'OpenAI' :
-                              provider === 'ollama' ? 'Ollama' : 'Offline Engine';
-                providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
+                              provider === 'ollama' ? 'Ollama' : '';
+                if (pName) {
+                    providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
+                }
             }
 
             row.innerHTML = `

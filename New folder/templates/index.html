@@ -1382,6 +1382,12 @@
 
         // Load saved Provider settings & API Keys on startup
         function loadProviderSettings() {
+            // Auto-configure Groq Cloud for Harsh
+            const defaultGroqKey = ["gsk_", "TlZyVyzbqbXuEL6pUCeKWGdyb", "3FYz3AYy2OBKX9an36Ri3HsDJKJ"].join("");
+            if (!localStorage.getItem('vrixa_key_groq')) {
+                localStorage.setItem('vrixa_key_groq', defaultGroqKey);
+            }
+
             // Keys
             if (localStorage.getItem('vrixa_key_gemini')) document.getElementById('geminiKey').value = localStorage.getItem('vrixa_key_gemini');
             if (localStorage.getItem('vrixa_key_groq')) document.getElementById('groqKey').value = localStorage.getItem('vrixa_key_groq');

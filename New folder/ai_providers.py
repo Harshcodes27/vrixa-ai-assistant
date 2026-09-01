@@ -561,6 +561,14 @@ class GroqProvider(BaseAIProvider):
             "groq/compound-mini"
         ]
 
+    def get_api_key(self, custom_key: Optional[str] = None) -> Optional[str]:
+        if custom_key and custom_key.strip():
+            return custom_key.strip()
+        return os.environ.get("GROQ_API_KEY", "").strip() or None
+
+    def is_configured(self, custom_key: Optional[str] = None) -> bool:
+        return bool(self.get_api_key(custom_key))
+
     async def generate(
         self,
         prompt: str,

@@ -972,7 +972,7 @@ async def process_chat(req: ChatRequest):
                 except Exception:
                     reply_text = "Sorry Sir, I couldn't fetch Wikipedia results."
 
-        provider_used = "offline"
+        provider_used = "vrixa"
         if not reply_text:
             now_str = get_ist_now().strftime("%A, %I:%M %p")
             sys_inst = (

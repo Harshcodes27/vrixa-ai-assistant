@@ -555,6 +555,7 @@
         .tag-claude { background: rgba(217, 119, 6, 0.18); color: #FBBF24; border: 1px solid rgba(217, 119, 6, 0.35); }
         .tag-openai { background: rgba(16, 185, 129, 0.18); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.35); }
         .tag-ollama { background: rgba(168, 85, 247, 0.18); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.35); }
+        .tag-vrixa { background: rgba(0, 240, 255, 0.18); color: #00F0FF; border: 1px solid rgba(0, 240, 255, 0.35); }
         .tag-offline { background: rgba(148, 163, 184, 0.15); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.25); }
         .btn-close-modal {
             width: 100%;
@@ -1702,7 +1703,8 @@
                               prov === 'groq' ? 'Groq Cloud' :
                               prov === 'claude' ? 'Anthropic Claude' :
                               prov === 'openai' ? 'OpenAI GPT' :
-                              prov === 'ollama' ? 'Local Ollama' : 'Offline Engine';
+                              prov === 'ollama' ? 'Local Ollama' :
+                              prov === 'vrixa' ? 'Vrixa Core' : 'Offline Engine';
                 providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
             }
 

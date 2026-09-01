@@ -709,6 +709,35 @@ async def process_chat(req: ChatRequest):
                     "• **College**: NGF College of Engineering & Technology, Palwal\n"
                     "• **Location**: Palwal, Haryana"
                 )
+            # 3. Dedicated Creator Resume & CV Generator
+            elif any(w in text_lower for w in ["resume", "cv", "biodata", "curriculum vitae"]):
+                reply_text = (
+                    "📄 **Professional Software Engineer Resume for Harsh**:\n\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    "# **HARSH**\n"
+                    "📍 **Palwal, Haryana** | 🎓 **B.Tech Computer Science & Engineering (2023-2027)**\n"
+                    "🔗 **GitHub**: [github.com/Harshcodes27](https://github.com/Harshcodes27) | 🌐 **Live Project**: [vrixa-ai-assistant-1.onrender.com](https://vrixa-ai-assistant-1.onrender.com)\n\n"
+                    "### 🎯 **PROFESSIONAL SUMMARY**\n"
+                    "Ambitious **Computer Science Engineer** with practical expertise in **Python, FastAPI, Full-Stack Web Development, and Multi-AI Orchestration (Gemini, Groq, OpenAI, Claude)**. Creator of autonomous systems, real-time voice-interactive web interfaces, and high-availability AI cloud architectures.\n\n"
+                    "### 💻 **TECHNICAL SKILLS**\n"
+                    "• **Languages**: Python, JavaScript (ES6+), SQL, HTML5, CSS3\n"
+                    "• **Backend & APIs**: FastAPI, Uvicorn, RESTful API Architecture, AsyncIO, HTTPX\n"
+                    "• **AI & LLM Systems**: Google Gemini API, Groq Cloud (Llama 3/GPT-OSS), OpenAI API, Claude, Local Ollama, Multi-AI Fallback Routing\n"
+                    "• **Tools & Platforms**: Git, GitHub, Render Cloud Platform, VS Code, Postman, Web Speech API\n\n"
+                    "### 🚀 **FEATURED PROJECTS**\n"
+                    "**1. VRIXA — Multimodal Autonomous AI Assistant & OS**\n"
+                    "• Engineered a full-stack, voice-enabled AI assistant with real-time **STARK HUD** responsive UI.\n"
+                    "• Architected a **Multi-AI Auto-Fallback Router** with 0-downtime resilience across Gemini, Groq, Claude, and OpenAI.\n"
+                    "• Integrated native PC hardware diagnostics, system automation, persistent JSON knowledge memory, and speech synthesis.\n\n"
+                    "**2. Multi-Model Intelligent API Orchestrator**\n"
+                    "• Developed an automated failover engine managing dynamic rate-limit recovery and latency tracking.\n"
+                    "• Built production microservices deployed on Render cloud with automated GitHub CI/CD pipelines.\n\n"
+                    "### 🎓 **EDUCATION**\n"
+                    "• **B.Tech in Computer Science & Engineering**\n"
+                    "  **NGF College of Engineering and Technology, Palwal** *(Roll No: 23035004049 | Batch: 2023–2027)*\n\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    "✨ *Harsh, aap niche '📋 Copy' button dabakar is resume ko directly copy kar sakte hain ya Google Docs / Canva mein paste kar sakte hain!*"
+                )
             elif ("your name" in text_lower or "tera naam" in text_lower or "apka naam" in text_lower or "aapka naam" in text_lower) and not ("my name" in text_lower or "mera naam" in text_lower):
                 reply_text = "I am VRIXA, your intelligent AI assistant created by Harsh."
             elif "who are you" in text_lower or "tum kaun ho" in text_lower or "tum kon ho" in text_lower:

@@ -4,12 +4,12 @@ import Header from './components/Header';
 import ChatArea from './components/ChatArea';
 import MessageInput from './components/MessageInput';
 import SettingsModal from './components/SettingsModal';
-import { jarvisBrain } from './services/jarvisBrain';
+import { vrixaBrain } from './services/vrixaBrain';
 import { speechService } from './services/speechService';
 
 export default function App() {
   const [sessions, setSessions] = useState(() => {
-    const saved = localStorage.getItem('JARVIS_CHAT_SESSIONS');
+    const saved = localStorage.getItem('VRIXA_CHAT_SESSIONS');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
@@ -17,7 +17,7 @@ export default function App() {
   });
 
   const [activeSessionId, setActiveSessionId] = useState(() => {
-    return localStorage.getItem('JARVIS_ACTIVE_SESSION_ID') || 'default-1';
+    return localStorage.getItem('VRIXA_ACTIVE_SESSION_ID') || 'default-1';
   });
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,11 +26,11 @@ export default function App() {
   const [isThinking, setIsThinking] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('JARVIS_CHAT_SESSIONS', JSON.stringify(sessions));
+    localStorage.setItem('VRIXA_CHAT_SESSIONS', JSON.stringify(sessions));
   }, [sessions]);
 
   useEffect(() => {
-    localStorage.setItem('JARVIS_ACTIVE_SESSION_ID', activeSessionId);
+    localStorage.setItem('VRIXA_ACTIVE_SESSION_ID', activeSessionId);
   }, [activeSessionId]);
 
   const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
@@ -82,7 +82,7 @@ export default function App() {
     setIsThinking(true);
 
     try {
-      const replyText = await jarvisBrain.processInput(text, attachments);
+      const replyText = await vrixaBrain.processInput(text, attachments);
       const botMsg = { sender: 'bot', text: replyText, timestamp: new Date().toISOString() };
 
       setSessions(prev => prev.map(session => {

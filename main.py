@@ -40,7 +40,7 @@ if __name__ == "__main__":
     
     import uvicorn
     print("=" * 65)
-    print("  VRIXA AI ASSISTANT - STARK HUD ONLINE")
+    print("  VRIXA AI ASSISTANT - CYBER HUD ONLINE")
     print("  HARSH - ROLL NO. 23035004049")
     print("-" * 65)
     print("  LAPTOP / PC LINK : http://127.0.0.1:8000")

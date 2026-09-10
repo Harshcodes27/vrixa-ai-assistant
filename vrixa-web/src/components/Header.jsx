@@ -10,7 +10,7 @@ export default function Header({ toggleSidebar, openSettings, ttsEnabled, setTts
         </button>
         <div className="brand-title">
           <Bot size={24} style={{ color: 'var(--accent-green)' }} />
-          <span>JARVIS AI</span>
+          <span>VRIXA AI</span>
           <span className="pulse-dot"></span>
         </div>
       </div>

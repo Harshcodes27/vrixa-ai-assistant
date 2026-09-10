@@ -20,10 +20,10 @@ export default function ChatArea({ messages, onSelectStarter, isThinking }) {
     <main className="chat-viewport" ref={scrollRef}>
       {messages.length === 0 ? (
         <div className="empty-state">
-          <div className="jarvis-avatar-large">
+          <div className="vrixa-avatar-large">
             <Bot size={42} style={{ color: 'var(--accent-green)' }} />
           </div>
-          <h1 className="welcome-title">I am JARVIS Ultra</h1>
+          <h1 className="welcome-title">I am Vrixa</h1>
           <p className="welcome-subtitle">Vision AI • Image Generation • Alarms • Live Weather • Document Reader</p>
 
           <div className="starters-grid">
@@ -47,7 +47,7 @@ export default function ChatArea({ messages, onSelectStarter, isThinking }) {
               </div>
               <div className="bubble-content" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Sparkles size={16} className="pulse-dot" />
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>JARVIS is processing...</span>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Vrixa is processing...</span>
               </div>
             </div>
           )}

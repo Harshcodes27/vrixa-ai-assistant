@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: jarvis-assistant-web
+    name: vrixa-assistant-web
     env: static
     buildCommand: npm run build
     staticPublishPath: ./dist

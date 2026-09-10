@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Key, Info, Brain, Trash2 } from 'lucide-react';
-import { jarvisBrain } from '../services/jarvisBrain';
+import { vrixaBrain } from '../services/vrixaBrain';
 
 export default function SettingsModal({ isOpen, onClose }) {
   const [apiKey, setApiKey] = useState('');
@@ -11,7 +11,7 @@ export default function SettingsModal({ isOpen, onClose }) {
     if (isOpen) {
       const storedKey = localStorage.getItem('GEMINI_API_KEY') || '';
       setApiKey(storedKey);
-      setMemories(jarvisBrain.getMemories());
+      setMemories(vrixaBrain.getMemories());
     }
   }, [isOpen]);
 
@@ -27,7 +27,7 @@ export default function SettingsModal({ isOpen, onClose }) {
   };
 
   const handleClearMemories = () => {
-    localStorage.removeItem('JARVIS_LONG_TERM_MEMORY');
+    localStorage.removeItem('VRIXA_LONG_TERM_MEMORY');
     setMemories([]);
   };
 
@@ -37,7 +37,7 @@ export default function SettingsModal({ isOpen, onClose }) {
         <div className="modal-header">
           <div className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Key size={20} style={{ color: 'var(--accent-green)' }} />
-            <span>Jarvis Settings & Memory</span>
+            <span>Vrixa Settings & Memory</span>
           </div>
           <button className="icon-btn" onClick={onClose} style={{ border: 'none' }}>
             <X size={18} />
@@ -74,7 +74,7 @@ export default function SettingsModal({ isOpen, onClose }) {
 
           {memories.length === 0 ? (
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-             <p className="no-memories">No facts remembered yet. Tell Jarvis "Remember that I like AI & coding" in any chat!</p>
+             <p className="no-memories">No facts remembered yet. Tell Vrixa "Remember that I like AI & coding" in any chat!</p>
             </div>
           ) : (
             <div style={{ maxHeight: '100px', overflowY: 'auto', background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>

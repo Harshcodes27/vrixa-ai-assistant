@@ -814,7 +814,7 @@ class OfflineProvider(BaseAIProvider):
         prompt_lower = prompt_clean.lower()
         
         # 1. Direct Conversational / Greeting handler (NEVER send to Wikipedia!)
-        greeting_words = {"hi", "hello", "hey", "hii", "heyy", "hlo", "hlw", "hloo", "helo", "hy", "namaste", "hola", "sup", "yo", "vrixa", "jarvis", "suno", "sun", "bol", "bolo", "bhai", "bro", "ok", "acha", "theek", "hmm"}
+        greeting_words = {"hi", "hello", "hey", "hii", "heyy", "hlo", "hlw", "hloo", "helo", "hy", "namaste", "hola", "sup", "yo", "vrixa", "suno", "sun", "bol", "bolo", "bhai", "bro", "ok", "acha", "theek", "hmm"}
         prompt_tokens = set(re.findall(r'\w+', prompt_lower))
 
         is_conversational = (
@@ -845,7 +845,7 @@ class OfflineProvider(BaseAIProvider):
             r'\b(what|who|where|when|why|how|is|are|was|were|tell|me|about|explain|describe)\b',
             r'\b(kon|kaun|kya|kaisa|kaisi|kaise|kab|kahan|kha|kaha|hai|h|hein|tha|thi|the)\b',
             r'\b(krte|krne|karna|karne|krna|karwa|karwane|karo|kare|hote|hota|hoti|karte|karta|karti|do|doing|make|use|used)\b',
-            r'\b(sir|please|plz|bhai|bro|vrixa|jarvis|ok)\b'
+            r'\b(sir|please|plz|bhai|bro|vrixa|ok)\b'
         ]
         cleaned_topic = prompt_clean
         for pat in stops:

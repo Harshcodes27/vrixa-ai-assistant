@@ -169,7 +169,7 @@ export default function MessageInput({ onSendMessage, disabled }) {
         <button 
           className={`mic-btn ${isListening ? 'listening' : ''}`} 
           onClick={toggleVoiceInput}
-          title={isListening ? "Listening... Click to stop" : "Speak to Jarvis"}
+          title={isListening ? "Listening... Click to stop" : "Speak to Vrixa"}
         >
           {isListening ? <MicOff size={20} /> : <Mic size={20} />}
         </button>
@@ -177,7 +177,7 @@ export default function MessageInput({ onSendMessage, disabled }) {
         <textarea
           ref={textareaRef}
           className="chat-input"
-          placeholder={isListening ? "Listening..." : "Ask Jarvis, attach files, set timers..."}
+          placeholder={isListening ? "Listening..." : "Ask Vrixa, attach files, set timers..."}
           rows={1}
           value={text}
           onChange={(e) => setText(e.target.value)}

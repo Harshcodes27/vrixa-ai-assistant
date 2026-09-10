@@ -19,7 +19,7 @@ import pyautogui
 pyautogui.FAILSAFE = False
 import pyttsx3
 import wikipedia
-wikipedia.set_user_agent("JarvisAIAssistant/3.0 (contact@personal-assistant.local)")
+wikipedia.set_user_agent("VrixaAIAssistant/2.0 (contact@personal-assistant.local)")
 import customtkinter as ctk
 import speech_recognition as sr
 from google import genai
@@ -111,7 +111,7 @@ class TextToSpeechEngine:
 import winsound
 
 class SoundFX:
-    """Iron Man style futuristic audio cues and HUD chimes."""
+    """Futuristic audio cues and HUD chimes."""
     @staticmethod
     def play_startup():
         def _run():
@@ -160,7 +160,7 @@ def load_user_knowledge():
                 return json.load(f)
         except Exception:
             pass
-    return {"user_name": "Sir", "assistant_name": "Jarvis", "location": "Delhi-NCR", "memories": []}
+    return {"user_name": "Sir", "assistant_name": "Vrixa", "location": "Delhi-NCR", "memories": []}
 
 def save_user_knowledge(data):
     try:
@@ -181,7 +181,7 @@ def save_chat_log(user_text, bot_reply):
     try:
         ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(CHAT_LOG_PATH, "a", encoding="utf-8") as f:
-            f.write(f"[{ts}] USER: {user_text}\n[{ts}] JARVIS: {bot_reply}\n\n")
+            f.write(f"[{ts}] USER: {user_text}\n[{ts}] VRIXA: {bot_reply}\n\n")
     except Exception:
         pass
 
@@ -422,7 +422,7 @@ class SystemAutomation:
             if gemini_client:
                 try:
                     img = Image.open(filepath)
-                    prompt = "You are Jarvis. Analyze what is currently open on this user screen in 2-3 crisp, helpful sentences. Mention the visible active apps, code, or web page clearly."
+                    prompt = "You are Vrixa. Analyze what is currently open on this user screen in 2-3 crisp, helpful sentences. Mention the visible active apps, code, or web page clearly."
                     for m in ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-flash-lite"]:
                         try:
                             resp = gemini_client.models.generate_content(model=m, contents=[img, prompt])
@@ -438,9 +438,9 @@ class SystemAutomation:
             return f"Could not analyze screen: {e}"
 
 # ==========================================
-# 4. Jarvis Brain with Gemini & Local Intelligence
+# 4. Vrixa Brain with Gemini & Local Intelligence
 # ==========================================
-class JarvisBrain:
+class VrixaBrain:
     def __init__(self):
         self.gemini_client = None
         self.conversation_context = []
@@ -691,7 +691,7 @@ class JarvisBrain:
                 mem_str = f"User Name: {user_name}. Memory Facts: {json.dumps(memories_list, ensure_ascii=False)}." if memories_list else f"User Name: {user_name}."
                 
                 system_prompt = (
-                    f"You are Madhavi, a brilliant, super helpful, sleek AI personal assistant developed by Harsh. "
+                    f"You are Vrixa, a brilliant, super helpful, sleek AI personal assistant developed by Harsh. "
                     f"Always address the user politely ({user_name}). "
                     f"Keep responses crisp, clear, accurate, and engaging with helpful emojis. Never produce bloated fluff. "
                     f"{mem_str}"
@@ -700,7 +700,7 @@ class JarvisBrain:
                 prompt_parts = [system_prompt]
                 for turn in self.conversation_context[-6:]:
                     prompt_parts.append(f"{turn['role'].title()}: {turn['content']}")
-                prompt_parts.append(f"User: {raw_text}\nMadhavi:")
+                prompt_parts.append(f"User: {raw_text}\nVrixa:")
 
                 # Try latest fast models
                 models = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-flash-lite"]
@@ -728,26 +728,26 @@ class JarvisBrain:
         # Basic Conversational Fallback
         greetings = ["hello", "hi", "hey", "namaste", "halo"]
         if any(w in text for w in greetings):
-            return f"Hello {user_name}! I am Madhavi, your personal AI assistant. Standing by for your instructions."
+            return f"Hello {user_name}! I am Vrixa, your personal AI assistant. Standing by for your instructions."
 
         return f"All systems operational, {user_name}! Ready for your next command."
 
 # ==========================================
 # 5. Modern CustomTkinter Desktop UI
 # ==========================================
-class JarvisApp(ctk.CTk):
+class VrixaApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         # Window configuration
-        self.title("JARVIS AI • Personal Desktop Assistant")
+        self.title("VRIXA AI • Personal Desktop Assistant")
         self.geometry("520x720")
         self.minsize(460, 600)
         
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
 
-        self.brain = JarvisBrain()
+        self.brain = VrixaBrain()
         self.recognizer = sr.Recognizer()
         self.is_listening = False
 
@@ -942,5 +942,5 @@ class JarvisApp(ctk.CTk):
             self.after(0, lambda: self.mic_btn.configure(fg_color="#1E232F", text="🎙️"))
 
 if __name__ == "__main__":
-    app = JarvisApp()
+    app = VrixaApp()
     app.mainloop()

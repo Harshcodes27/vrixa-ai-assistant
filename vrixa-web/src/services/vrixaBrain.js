@@ -1,13 +1,14 @@
-class JarvisBrain {
+class VrixaBrain {
   constructor() {
     this.responses = {
       'hi': ['Hello! Harsh Sir, I am ready to assist you.', 'Hi Harsh Sir, I am standing by for your command.'],
       'greetings': ['Hello Harsh Sir, all systems are operational.'],
       'how are you': ['I am operating at peak efficiency, thank you for asking Harsh Sir.'],
       'hello': ['Hello Harsh Sir, I am ready to assist you.'],
-      'thank you jarvis': ['Always a pleasure to assist you, Harsh Sir!'],
-      'introduce': ['I am Jarvis, your personal AI assistant created by Harsh Sir (Roll No: 23035004049).'],
-      'who created you': ['I am Jarvis, your intelligent AI assistant created by Harsh Sir (Roll No: 23035004049) at NGF College, Palwal!'],
+      'thank you vrixa': ['Always a pleasure to assist you, Harsh Sir!'],
+      'thank you': ['Always a pleasure to assist you, Harsh Sir!'],
+      'introduce': ['I am Vrixa, your personal AI assistant created by Harsh Sir (Roll No: 23035004049).'],
+      'who created you': ['I am Vrixa, your intelligent AI assistant created by Harsh Sir (Roll No: 23035004049) at NGF College, Palwal!'],
       'friend': ['Your close friends are:\n• Harshit\n• Ayush\n• Kartikey\n• Kartik\n• Aniket\n• Bhupender\n\nAlways ready to assist you and your friends, Harsh Sir!'],
       'friends': ['Your close friends are:\n• Harshit\n• Ayush\n• Kartikey\n• Kartik\n• Aniket\n• Bhupender\n\nAlways ready to assist you and your friends, Harsh Sir!'],
       'dost': ['Your close friends are:\n• Harshit\n• Ayush\n• Kartikey\n• Kartik\n• Aniket\n• Bhupender\n\nAlways ready to assist you and your friends, Harsh Sir!'],
@@ -16,7 +17,7 @@ class JarvisBrain {
 
   getMemories() {
     try {
-      const saved = localStorage.getItem('JARVIS_LONG_TERM_MEMORY');
+      const saved = localStorage.getItem('VRIXA_LONG_TERM_MEMORY');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
       return [];
@@ -33,7 +34,7 @@ class JarvisBrain {
     
     if (!exists) {
       memories.push(cleanFact);
-      localStorage.setItem('JARVIS_LONG_TERM_MEMORY', JSON.stringify(memories));
+      localStorage.setItem('VRIXA_LONG_TERM_MEMORY', JSON.stringify(memories));
     }
   }
 
@@ -136,9 +137,9 @@ class JarvisBrain {
       setTimeout(() => {
         this.playAlarmChime();
         if ("Notification" in window && Notification.permission === "granted") {
-          new Notification("JARVIS Reminder", { body: `Sir, time to: ${task}`, icon: "/favicon.ico" });
+          new Notification("Vrixa Reminder", { body: `Sir, time to: ${task}`, icon: "/favicon.ico" });
         } else {
-          alert(`⏰ JARVIS REMINDER: Sir, time to ${task}!`);
+          alert(`⏰ VRIXA REMINDER: Sir, time to ${task}!`);
         }
       }, durationMs);
 
@@ -195,7 +196,7 @@ class JarvisBrain {
       memoryContext = `\n[GLOBAL MEMORY STORED ABOUT USER ACROSS ALL CHATS]:\n- ${memories.join('\n- ')}\n`;
     }
 
-    let promptText = `You are Jarvis, an advanced AI assistant inspired by Iron Man.${memoryContext}\nUser prompt: ${text || "Please analyze the attached files/images."}`;
+    let promptText = `You are Vrixa, an advanced AI assistant developed by Harsh.${memoryContext}\nUser prompt: ${text || "Please analyze the attached files/images."}`;
 
     const partsPayload = [];
     if (attachments.length > 0) {
@@ -256,4 +257,4 @@ class JarvisBrain {
   }
 }
 
-export const jarvisBrain = new JarvisBrain();
+export const vrixaBrain = new VrixaBrain();

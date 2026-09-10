@@ -18,7 +18,7 @@ from PIL import Image
 import pyautogui
 import pyttsx3
 import wikipedia
-wikipedia.set_user_agent("JarvisAIAssistant/3.0 (contact@personal-assistant.local)")
+wikipedia.set_user_agent("VrixaAIAssistant/2.0 (contact@personal-assistant.local)")
 import customtkinter as ctk
 import speech_recognition as sr
 from google import genai
@@ -124,7 +124,7 @@ def load_user_knowledge():
                 return json.load(f)
         except Exception:
             pass
-    return {"user_name": "Sir", "assistant_name": "Jarvis", "location": "Delhi-NCR", "memories": []}
+    return {"user_name": "Sir", "assistant_name": "Vrixa", "location": "Delhi-NCR", "memories": []}
 
 def save_user_knowledge(data):
     try:
@@ -145,7 +145,7 @@ def save_chat_log(user_text, bot_reply):
     try:
         ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(CHAT_LOG_PATH, "a", encoding="utf-8") as f:
-            f.write(f"[{ts}] USER: {user_text}\n[{ts}] JARVIS: {bot_reply}\n\n")
+            f.write(f"[{ts}] USER: {user_text}\n[{ts}] VRIXA: {bot_reply}\n\n")
     except Exception:
         pass
 
@@ -318,9 +318,9 @@ class SystemAutomation:
             return f"🌤️ Currently around 29°C in {location} with clear skies."
 
 # ==========================================
-# 4. Jarvis Brain with Gemini & Local Intelligence
+# 4. Vrixa Brain with Gemini & Local Intelligence
 # ==========================================
-class JarvisBrain:
+class VrixaBrain:
     def __init__(self):
         self.gemini_client = None
         self.conversation_context = []
@@ -364,8 +364,8 @@ class JarvisBrain:
                 add_memory_fact(fact)
                 return f"Got it, {user_name}! I have saved this fact to my permanent memory:\n\"{fact}\""
 
-        if any(w in text for w in ["who created", "who made", "owner", "malik", "kisne banaya", "who developed"]):
-            return "I am Jarvis, your intelligent AI assistant created by Harsh (Roll No: 23035004049)!"
+        if any(w in text for w in ["who created", "who made", "owner", "malik", "kisne banaya", "who developed", "who are you", "what is your name", "tera naam", "tum kaun ho", "apka naam"]):
+            return "I am Vrixa, your intelligent AI assistant created by Harsh (Roll No: 23035004049)!"
 
         if any(w in text for w in ["what do you know about me", "my memories", "mera data", "what is my name", "mera naam"]):
             mems = user_info.get("memories", [])
@@ -509,7 +509,7 @@ class JarvisBrain:
                 mem_str = f"User Name: {user_name}. Memory Facts: {json.dumps(memories_list, ensure_ascii=False)}." if memories_list else f"User Name: {user_name}."
                 
                 system_prompt = (
-                    f"You are Jarvis, a brilliant, super helpful, sleek AI personal assistant. "
+                    f"You are Vrixa, a brilliant, super helpful, sleek AI personal assistant developed by Harsh. "
                     f"Always address the user politely ({user_name}). "
                     f"Keep responses crisp, clear, accurate, and engaging with helpful emojis. Never produce bloated fluff. "
                     f"{mem_str}"
@@ -518,7 +518,7 @@ class JarvisBrain:
                 prompt_parts = [system_prompt]
                 for turn in self.conversation_context[-6:]:
                     prompt_parts.append(f"{turn['role'].title()}: {turn['content']}")
-                prompt_parts.append(f"User: {raw_text}\nJarvis:")
+                prompt_parts.append(f"User: {raw_text}\nVrixa:")
 
                 # Try latest fast models
                 models = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-flash-lite"]
@@ -546,26 +546,26 @@ class JarvisBrain:
         # Basic Conversational Fallback
         greetings = ["hello", "hi", "hey", "namaste", "halo"]
         if any(w in text for w in greetings):
-            return f"Hello {user_name}! I am Jarvis, your personal AI assistant. Standing by for your instructions."
+            return f"Hello {user_name}! I am Vrixa, your personal AI assistant. Standing by for your instructions."
 
         return f"All systems operational, {user_name}! Ready for your next command."
 
 # ==========================================
 # 5. Modern CustomTkinter Desktop UI
 # ==========================================
-class JarvisApp(ctk.CTk):
+class VrixaApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         # Window configuration
-        self.title("JARVIS AI • Personal Desktop Assistant")
+        self.title("VRIXA AI • Personal Desktop Assistant")
         self.geometry("520x720")
         self.minsize(460, 600)
         
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("green")
 
-        self.brain = JarvisBrain()
+        self.brain = VrixaBrain()
         self.recognizer = sr.Recognizer()
         self.is_listening = False
 
@@ -579,7 +579,7 @@ class JarvisApp(ctk.CTk):
 
         title_lbl = ctk.CTkLabel(
             header,
-            text="⚡ JARVIS AI ASSISTANT",
+            text="⚡ VRIXA AI ASSISTANT",
             font=ctk.CTkFont(family="Outfit", size=18, weight="bold"),
             text_color="#25D366"
         )
@@ -675,7 +675,7 @@ class JarvisApp(ctk.CTk):
     def _greet_on_launch(self):
         user_info = load_user_knowledge()
         user_name = user_info.get("user_name", "Sir")
-        greeting = f"⚡ Jarvis systems online. All system automation protocols ready. How may I assist you today, {user_name}?"
+        greeting = f"⚡ Vrixa systems online. All system automation protocols ready. How may I assist you today, {user_name}?"
         self.add_bubble(greeting, "bot")
         tts.speak(greeting)
 
@@ -756,5 +756,5 @@ class JarvisApp(ctk.CTk):
             self.after(0, lambda: self.mic_btn.configure(fg_color="#1E232F", text="🎙️"))
 
 if __name__ == "__main__":
-    app = JarvisApp()
+    app = VrixaApp()
     app.mainloop()

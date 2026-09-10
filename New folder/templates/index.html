@@ -567,8 +567,8 @@
             font-weight: bold;
             cursor: pointer;
         }
-        /* Marvel / Stark HUD Intro Overlay */
-        .marvel-intro-overlay {
+        /* Cyber HUD Intro Overlay */
+        .vrixa-intro-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -587,13 +587,13 @@
             -webkit-overflow-scrolling: touch;
             box-sizing: border-box;
         }
-        .marvel-intro-overlay.fade-out {
+        .vrixa-intro-overlay.fade-out {
             opacity: 0;
             transform: scale(1.2);
             filter: blur(15px);
             pointer-events: none;
         }
-        .jarvis-hud-container {
+        .vrixa-hud-container {
             position: relative;
             width: 220px;
             height: 220px;
@@ -602,7 +602,7 @@
             align-items: center;
             justify-content: center;
         }
-        .jarvis-hud-ring {
+        .vrixa-hud-ring {
             position: absolute;
             border-radius: 50%;
             display: flex;
@@ -641,7 +641,7 @@
             background: rgba(0, 240, 255, 0.05);
             animation: pulseGlow 2s ease-in-out infinite alternate;
         }
-        .hud-jarvis-text {
+        .hud-vrixa-text {
             font-size: 18px;
             font-weight: 900;
             letter-spacing: 3px;
@@ -661,7 +661,7 @@
             0% { box-shadow: 0 0 15px #00F0FF, inset 0 0 10px rgba(0, 240, 255, 0.3); }
             100% { box-shadow: 0 0 35px #00F0FF, inset 0 0 25px rgba(0, 240, 255, 0.7); }
         }
-        .stark-header {
+        .vrixa-header-tag {
             font-size: 13px;
             letter-spacing: 4px;
             color: #00F0FF;
@@ -670,7 +670,7 @@
             font-weight: 600;
             text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
         }
-        .marvel-title {
+        .vrixa-title {
             font-size: 36px;
             font-weight: 800;
             letter-spacing: 2px;
@@ -681,7 +681,7 @@
             text-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
         }
         @media (max-width: 600px) {
-            .marvel-title { font-size: 26px; }
+            .vrixa-title { font-size: 26px; }
         }
         .hud-status {
             font-size: 12px;
@@ -923,7 +923,7 @@
             .bubble {
                 font-size: 15px;
             }
-            .marvel-title {
+            .vrixa-title {
                 font-size: 38px;
             }
         }
@@ -1028,8 +1028,8 @@
                 font-size: 15px;
             }
 
-            /* Responsive Marvel Intro HUD Overlay */
-            .jarvis-hud-container {
+            /* Responsive Cyber Intro HUD Overlay */
+            .vrixa-hud-container {
                 width: 140px;
                 height: 140px;
                 margin-bottom: 16px;
@@ -1038,15 +1038,15 @@
             .hud-mid-arc { width: 115px; height: 115px; }
             .hud-mid-solid { width: 90px; height: 90px; }
             .hud-inner-glow { width: 70px; height: 70px; }
-            .hud-jarvis-text { font-size: 11px; letter-spacing: 2px; }
+            .hud-vrixa-text { font-size: 11px; letter-spacing: 2px; }
 
-            .stark-header {
+            .vrixa-header-tag {
                 font-size: 10px;
                 letter-spacing: 1.5px;
                 padding: 0 10px;
                 line-height: 1.3;
             }
-            .marvel-title {
+            .vrixa-title {
                 font-size: 20px;
                 padding: 0 8px;
                 line-height: 1.3;
@@ -1082,20 +1082,20 @@
     <!-- Sidebar Backdrop for Mobile -->
     <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
 
-    <!-- Marvel / Stark HUD Intro Overlay -->
-    <div id="marvelIntro" class="marvel-intro-overlay">
-        <div class="jarvis-hud-container">
-            <div class="jarvis-hud-ring hud-outer-dashed"></div>
-            <div class="jarvis-hud-ring hud-mid-arc"></div>
-            <div class="jarvis-hud-ring hud-mid-solid"></div>
-            <div class="jarvis-hud-ring hud-inner-glow">
-                <span class="hud-jarvis-text">V.R.I.X.A</span>
+    <!-- Cyber HUD Intro Overlay -->
+    <div id="vrixaIntro" class="vrixa-intro-overlay">
+        <div class="vrixa-hud-container">
+            <div class="vrixa-hud-ring hud-outer-dashed"></div>
+            <div class="vrixa-hud-ring hud-mid-arc"></div>
+            <div class="vrixa-hud-ring hud-mid-solid"></div>
+            <div class="vrixa-hud-ring hud-inner-glow">
+                <span class="hud-vrixa-text">V.R.I.X.A</span>
             </div>
         </div>
-        <div class="stark-header">HARSH • ROLL NO. 23035004049 | B.TECH CSE FINAL YEAR PROJECT</div>
-        <h1 class="marvel-title">VRIXA: INTELLIGENT AI ASSISTANT</h1>
+        <div class="vrixa-header-tag">HARSH • ROLL NO. 23035004049 | B.TECH CSE FINAL YEAR PROJECT</div>
+        <h1 class="vrixa-title">VRIXA: INTELLIGENT AI ASSISTANT</h1>
         <div class="hud-status">POWERED BY GEMINI API INTEGRATION • ALL SYSTEMS NOMINAL</div>
-        <button class="btn-tap-continue" onclick="enterStarkLabs()">
+        <button class="btn-tap-continue" onclick="enterVrixa()">
             <span>🔘 TAP TO ENTER PROJECT DEMO</span>
         </button>
     </div>
@@ -1121,7 +1121,7 @@
             </div>
             <div class="header-controls">
                 <span id="statusBadge" class="badge-status online">🟢 Live</span>
-                <button class="btn-settings btn-desktop-hide btn-desktop-extra" onclick="playStarkBootSound(); speak('VRIXA online and fully operational.');">⚡ Boot</button>
+                <button class="btn-settings btn-desktop-hide btn-desktop-extra" onclick="playVrixaBootSound(); speak('VRIXA online and fully operational.');">⚡ Boot</button>
                 <button class="btn-settings btn-desktop-hide" onclick="sendQuickPrompt('Introduce the project')">🎓 Viva Pitch</button>
                 <button class="btn-settings btn-desktop-hide btn-desktop-extra" onclick="sendQuickPrompt('System diagnostics')">💻 Diag</button>
                 <button class="btn-mute-toggle" id="quickMuteBtn" onclick="toggleQuickMute()">🔊 <span class="btn-desktop-hide">Sound</span></button>
@@ -1136,7 +1136,7 @@
             <button class="chip-btn" onclick="sendQuickPrompt('Take screenshot')" style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">📸 PC Screenshot</button>
             <button class="chip-btn" onclick="sendQuickPrompt('System diagnostics')" style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">💻 PC Diagnostics</button>
             <button class="chip-btn" onclick="sendQuickPrompt('What is the weather today')" style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">🌤️ Weather</button>
-            <button class="chip-btn" onclick="sendQuickPrompt('Play Iron Man theme song on YouTube')" style="background: rgba(255, 0, 80, 0.1); border: 1px solid #ff0050; color: #ff0050; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">▶️ Play YouTube</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('Play lo-fi coding music on YouTube')" style="background: rgba(255, 0, 80, 0.1); border: 1px solid #ff0050; color: #ff0050; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">▶️ Play YouTube</button>
             <button class="chip-btn" onclick="sendQuickPrompt('Show my tasks')" style="background: rgba(30, 64, 175, 0.2); border: 1px solid #3B82F6; color: #60A5FA; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">📝 To-Do Tasks</button>
             <button class="chip-btn" onclick="sendQuickPrompt('Lock PC')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; color: #F87171; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">🔒 Lock PC</button>
             <button class="chip-btn" onclick="sendQuickPrompt('Who are my friends')" style="background: rgba(255, 200, 0, 0.1); border: 1px solid #ffc800; color: #ffc800; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">👥 Friends</button>
@@ -1160,7 +1160,7 @@
         </div>
     </div>
 
-    <!-- Stark Calendar Panel -->
+    <!-- Vrixa Calendar Panel -->
     <div class="calendar-panel" id="calendarPanel">
         <div class="calendar-container">
             <div class="calendar-header">
@@ -1383,11 +1383,7 @@
 
         // Load saved Provider settings & API Keys on startup
         function loadProviderSettings() {
-            // Auto-configure Groq Cloud for Harsh
-            const defaultGroqKey = ["gsk_", "TlZyVyzbqbXuEL6pUCeKWGdyb", "3FYz3AYy2OBKX9an36Ri3HsDJKJ"].join("");
-            if (!localStorage.getItem('vrixa_key_groq')) {
-                localStorage.setItem('vrixa_key_groq', defaultGroqKey);
-            }
+            // Provider settings and API keys are loaded from localStorage if set by the user
 
             // Keys
             if (localStorage.getItem('vrixa_key_gemini')) document.getElementById('geminiKey').value = localStorage.getItem('vrixa_key_gemini');
@@ -1936,7 +1932,7 @@
             }
         }
 
-        function playStarkBootSound() {
+        function playVrixaBootSound() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
@@ -1971,12 +1967,12 @@
                     osc.stop(startTime + 1.3);
                 });
             } catch (err) {
-                console.warn("Stark Boot Audio Error:", err);
+                console.warn("Vrixa Boot Audio Error:", err);
             }
         }
 
-        function enterStarkLabs() {
-            const intro = document.getElementById('marvelIntro');
+        function enterVrixa() {
+            const intro = document.getElementById('vrixaIntro');
             if (intro) {
                 intro.classList.add('fade-out');
                 setTimeout(() => {
@@ -1985,9 +1981,9 @@
             }
             
             // 1. Play futuristic Arc Reactor Boot Sound
-            playStarkBootSound();
+            playVrixaBootSound();
 
-            // 2. Speak authentic Stark AI Welcome greeting
+            // 2. Speak authentic Vrixa AI Welcome greeting
             if ('speechSynthesis' in window && document.getElementById('voiceToggle').checked) {
                 const synth = window.speechSynthesis;
                 synth.cancel();
@@ -2001,7 +1997,7 @@
         }
 
         // ==========================================
-        // Stark Calendar Widget Logic
+        // Vrixa Calendar Widget Logic
         // ==========================================
         let currentCalMonth = new Date().getMonth();
         let currentCalYear = new Date().getFullYear();

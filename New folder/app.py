@@ -647,7 +647,7 @@ async def process_chat(req: ChatRequest):
                     reply_text = "👥 **Your Close Friends (Harsh)**:\n\n" + "\n".join(f_lines)
             
             # Fast Instant Greetings & Chit-Chat (<1ms Zero Network Latency)
-            greeting_words = {"hi", "hello", "hey", "hii", "heyy", "hlo", "hlw", "hloo", "helo", "hy", "namaste", "hola", "sup", "yo", "vrixa", "jarvis"}
+            greeting_words = {"hi", "hello", "hey", "hii", "heyy", "hlo", "hlw", "hloo", "helo", "hy", "namaste", "hola", "sup", "yo", "vrixa"}
             msg_tokens = set(re.findall(r'\w+', text_lower))
             
             if (msg_tokens and msg_tokens.issubset(greeting_words)) or text_lower in ["hi vrixa", "hello vrixa", "hey vrixa", "hlo vrixa", "hlw vrixa"]:
@@ -726,7 +726,7 @@ async def process_chat(req: ChatRequest):
                     "• **Tools & Platforms**: Git, GitHub, Render Cloud Platform, VS Code, Postman, Web Speech API\n\n"
                     "### 🚀 **FEATURED PROJECTS**\n"
                     "**1. VRIXA — Multimodal Autonomous AI Assistant & OS**\n"
-                    "• Engineered a full-stack, voice-enabled AI assistant with real-time **STARK HUD** responsive UI.\n"
+                    "• Engineered a full-stack, voice-enabled AI assistant with real-time **Cyber HUD** responsive UI.\n"
                     "• Architected a **Multi-AI Auto-Fallback Router** with 0-downtime resilience across Gemini, Groq, Claude, and OpenAI.\n"
                     "• Integrated native PC hardware diagnostics, system automation, persistent JSON knowledge memory, and speech synthesis.\n\n"
                     "**2. Multi-Model Intelligent API Orchestrator**\n"
@@ -785,7 +785,7 @@ async def process_chat(req: ChatRequest):
                     query = query.replace(term, "")
                 query = query.strip()
                 if not query:
-                    query = "Iron Man theme song"
+                    query = "lo-fi coding beats"
                 action_url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
                 reply_text = f"▶️ Searching and playing **'{query.title()}'** on YouTube for you, Harsh! 🎵"
 

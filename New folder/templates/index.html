@@ -1131,6 +1131,7 @@
         </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="quick-chips-bar" style="display: flex; gap: 8px; padding: 6px 16px; overflow-x: auto; background: rgba(10, 15, 25, 0.7); border-top: 1px solid rgba(0, 240, 255, 0.15);">
+            <button class="chip-btn" onclick="sendQuickPrompt('Generate image of a futuristic cyberpunk city with neon flying cars')" style="background: rgba(255, 46, 147, 0.18); border: 1px solid #FF2E93; color: #FF70B8; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">🎨 Generate AI Image</button>
             <button class="chip-btn" onclick="sendQuickPrompt('Introduce the project')" style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">🎓 Viva Pitch</button>
             <button class="chip-btn" onclick="sendQuickPrompt('Tech news')" style="background: rgba(168, 85, 247, 0.15); border: 1px solid #A855F7; color: #C084FC; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">📰 Tech News</button>
             <button class="chip-btn" onclick="sendQuickPrompt('Take screenshot')" style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; font-weight: bold; white-space: nowrap;">📸 PC Screenshot</button>
@@ -1664,7 +1665,7 @@
             currentSessionId = s.id;
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
-            (s.messages || []).forEach(m => addBubble(m.text, m.sender, m.timestamp));
+            (s.messages || []).forEach(m => addBubble(m.text, m.sender, m.timestamp, m.image_url || null, m.provider || null));
             loadSessions();
             closeMobileSidebar();
         }
@@ -1675,6 +1676,7 @@
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
+                .replace(/!\[(.*?)\]\((.*?)\)/g, '<div class="bubble-image-card" style="margin: 10px 0; border-radius: 12px; overflow: hidden; border: 1px solid #00F0FF; background: rgba(5, 10, 20, 0.85); box-shadow: 0 4px 20px rgba(0, 240, 255, 0.25); max-width: 480px; width: 100%;"><img src="$2" alt="$1" style="width: 100%; max-height: 380px; object-fit: cover; display: block; cursor: pointer;" onclick="window.open(\'$2\', \'_blank\')" title="Click to view full resolution"><div style="padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; background: rgba(10, 15, 30, 0.9); border-top: 1px solid rgba(0, 240, 255, 0.2);"><span style="font-size: 11px; color: #00F0FF; font-weight: 600;">🎨 $1</span><a href="$2" target="_blank" download style="color: #FFF; font-size: 11px; text-decoration: none; border: 1px solid #00F0FF; background: rgba(0, 240, 255, 0.2); padding: 3px 8px; border-radius: 5px; font-weight: 600;">⬇️ Open Full Size</a></div></div>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
                 .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: #60A5FA; text-decoration: underline; font-weight: bold;">$1</a>')
@@ -1689,7 +1691,21 @@
 
             const now = timeStr || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             let formattedText = formatMarkdown(text);
-            let imageHtml = imageSrc ? `<div style="margin-bottom: 8px;"><img src="${imageSrc}" style="max-width: 260px; max-height: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); object-fit: cover;"></div>` : '';
+            let imageHtml = imageSrc ? `
+                <div class="bubble-image-card" style="margin: 10px 0; border-radius: 12px; overflow: hidden; border: 1px solid #00F0FF; background: rgba(5, 10, 20, 0.85); box-shadow: 0 0 20px rgba(0, 240, 255, 0.25); max-width: 480px; width: 100%;">
+                    <div style="position: relative; width: 100%; min-height: 160px; display: flex; align-items: center; justify-content: center; background: #050a14;">
+                        <img src="${imageSrc}" alt="Vrixa Generated Art" loading="lazy" style="width: 100%; max-height: 380px; object-fit: cover; display: block; cursor: pointer; transition: transform 0.25s ease;" onclick="window.open('${imageSrc}', '_blank')" title="Click to view full resolution" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'160\\'%3E%3Crect width=\\'100%25\\' height=\\'100%25\\' fill=\\'%23111827\\'/ %3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' fill=\\'%2300F0FF\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'13\\'%3EImage loading. Click to open directly.%3C/text%3E%3C/svg%3E';">
+                    </div>
+                    <div style="padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(0, 240, 255, 0.2); background: rgba(10, 15, 30, 0.9);">
+                        <span style="font-size: 11px; color: #00F0FF; font-weight: 600; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">
+                            🎨 <span>FLUX 1.0 HD</span>
+                        </span>
+                        <a href="${imageSrc}" target="_blank" download="vrixa-art.jpg" style="font-size: 11px; color: #FFF; background: rgba(0, 240, 255, 0.2); border: 1px solid #00F0FF; padding: 4px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            ⬇️ Open / Save Full Size
+                        </a>
+                    </div>
+                </div>
+            ` : '';
 
             let providerBadge = '';
             if (sender === 'bot' && provider) {
@@ -1700,8 +1716,10 @@
                               prov === 'claude' ? 'Anthropic Claude' :
                               prov === 'openai' ? 'OpenAI GPT' :
                               prov === 'ollama' ? 'Local Ollama' :
+                              prov === 'vrixa-image' ? '🎨 FLUX Image AI' :
                               prov === 'vrixa' ? 'Vrixa Core' : 'Offline Engine';
-                providerBadge = `<span class="provider-used-tag ${pClass}">⚡ ${pName}</span>`;
+                const extraStyle = prov === 'vrixa-image' ? 'style="background: linear-gradient(135deg, rgba(255, 46, 147, 0.25), rgba(0, 240, 255, 0.2)); border: 1px solid #FF2E93; color: #FF70B8;"' : '';
+                providerBadge = `<span class="provider-used-tag ${pClass}" ${extraStyle}>⚡ ${pName}</span>`;
             }
 
             row.innerHTML = `
@@ -1849,9 +1867,9 @@
                     badge.innerText = '🟢 AI Online';
                 }
 
-                addBubble(data.reply, 'bot', data.timestamp, null, data.provider);
+                addBubble(data.reply, 'bot', data.timestamp, data.image_url || null, data.provider);
                 speak(data.reply);
-                if (data.action_url) {
+                if (data.action_url && !data.image_url) {
                     window.open(data.action_url, '_blank');
                 }
                 loadSessions();

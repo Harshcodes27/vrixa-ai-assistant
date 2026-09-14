@@ -34,36 +34,43 @@ In addition to intelligent query routing, Vrixa bridges cloud intelligence with 
 - **Screen & Image Comprehension**: Accepts base64 image uploads or desktop screenshots alongside user prompts for visual question answering using Gemini Vision.
 - **Remote / Local Screenshot Capture**: Native screenshot routine capturing full desktop frames with system telemetry overlays.
 
-### 3. Responsive Cyber HUD Web Interface
+### 3. AI Image Generation (FLUX Engine)
+- **High-Definition Synthesis**: Generates 1024x1024 high-res AI artwork directly from natural language prompts using the **FLUX.1** deep learning model.
+- **Zero API Key Requirement**: 100% free, zero-config image synthesis with infinite quota and zero-cost operation.
+- **Multilingual Intent Support**: Supports natural English (`generate image of...`, `draw a...`) and Hindi/Hinglish (`image banao`, `photo banao`, `tasveer banao`) voice and text triggers.
+- **Interactive Cyber Card**: Generated images render directly in the Cyber HUD chat with full-screen expansion and instant one-click download.
+- **Dedicated REST API**: Exposes `POST /api/generate-image` endpoint for external integrations.
+
+### 4. Responsive Cyber HUD Web Interface
 - **Mobile-First Responsive Layout**: Built with modern CSS custom properties, viewport-fit cover, and dynamic viewport units (`100dvh`) for seamless operation across desktop, tablet, and mobile devices.
 - **Real-Time Audio Visualizer**: Canvas-based animated neon frequency visualizer responding to voice state.
 - **Provider Status Chips**: Real-time visual indicators displaying the health and configuration status of each AI engine.
 - **Session & Chat History Management**: Local session switching, new chat creation, and history persistence.
 
-### 4. Bidirectional Voice Interaction
+### 5. Bidirectional Voice Interaction
 - **Speech Recognition**: Voice input powered by the Web Speech API with support for Indian English (`en-IN`) and bilingual queries.
 - **Text-to-Speech (TTS)**: Clean synthesis of assistant replies using the native browser `speechSynthesis` engine with link and markdown stripping for clear audio output.
 
-### 5. Live System Telemetry & Diagnostics
+### 6. Live System Telemetry & Diagnostics
 - Monitors hardware health in real-time via `psutil`:
   - CPU Utilization percentage
   - RAM memory usage (GB utilized vs. total available)
   - Storage disk availability
   - Battery percentage and power source (AC power vs. battery)
 
-### 6. Desktop & OS Automation
+### 7. Desktop & OS Automation
 - **App Launcher**: Opens local desktop software (VS Code, Google Chrome, Notepad, Calculator, Windows Terminal, Paint, Task Manager).
 - **Audio Control**: System volume adjustment (volume up, volume down, mute/unmute) via `pyautogui`.
 - **Security Lock**: Quick desktop workstation lock via Windows `ctypes` User32 API.
 
-### 7. Built-in Local Tools & Quick Services
+### 8. Built-in Local Tools & Quick Services
 - **Weather Forecast**: Real-time meteorological data and rain probability for Palwal / Delhi-NCR via Open-Meteo API (no API key required).
 - **Schedule & Calendar Store**: Structured event and birthday tracking with on-the-fly date parsing and reminders.
 - **To-Do Task Checklist**: Voice- and text-driven task creation, listing, and clearing stored in persistent JSON storage.
 - **Smart Web Actions**: Quick navigation to YouTube search, WhatsApp Web messaging, Gmail compose, and Indian e-commerce platforms (Amazon, Flipkart, Myntra, Meesho).
 - **Instant Math Evaluator**: Safe local regex arithmetic evaluation for rapid calculations without LLM roundtrips.
 
-### 8. Alternative Desktop GUI Client (`vrixa_app.py`)
+### 9. Alternative Desktop GUI Client (`vrixa_app.py`)
 - Independent dark-theme desktop application powered by **CustomTkinter**.
 - Incorporates offline text-to-speech via `pyttsx3` (SAPI5), microphone voice recognition via `speech_recognition`, and futuristic system chimes via `winsound`.
 
@@ -75,6 +82,7 @@ In addition to intelligent query routing, Vrixa bridges cloud intelligence with 
 | :--- | :--- | :--- |
 | **Backend Framework** | [FastAPI](https://fastapi.tiangolo.com/) | High-performance asynchronous REST API and routing |
 | **ASGI Server** | [Uvicorn](https://www.uvicorn.org/) | Production ASGI server running asynchronous event loops |
+| **AI Image Generation** | [Pollinations AI (FLUX.1)](https://pollinations.ai/) | Zero-key high-resolution 1024x1024 text-to-image synthesis |
 | **Primary AI Provider** | [Google GenAI SDK](https://github.com/googleapis/python-genai) | Gemini 3.6 Flash / 3.5 Flash multimodal reasoning and vision |
 | **Cloud Fallback AI** | [Groq Cloud API](https://groq.com/) | Ultra-low latency Llama & Qwen inference via `httpx` |
 | **Cloud Fallback AI** | [Anthropic Claude API](https://anthropic.com/) | Claude 3.5 Haiku high-accuracy reasoning |

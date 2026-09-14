@@ -112,12 +112,26 @@ class VrixaBrain {
     const text = userInput.trim();
     const lower = text.toLowerCase();
 
-    // 1. Check AI Image Generation commands
-    if (lower.startsWith("generate image") || lower.startsWith("draw") || lower.startsWith("create image") || lower.startsWith("make an image")) {
-      const imagePrompt = text.replace(/generate image of|generate image|draw|create image of|create image|make an image of|make an image/gi, "").trim();
+    // 1. Check AI Image Generation commands (English & Hindi/Hinglish)
+    const isImageCmd = lower.startsWith("generate image") || 
+                       lower.startsWith("draw") || 
+                       lower.startsWith("create image") || 
+                       lower.startsWith("make an image") ||
+                       lower.startsWith("picture of") ||
+                       lower.startsWith("photo of") ||
+                       lower.includes("image banao") ||
+                       lower.includes("photo banao") ||
+                       lower.includes("tasveer banao");
+
+    if (isImageCmd) {
+      let imagePrompt = text.replace(/generate image of|generate image|draw a|draw an|draw|create image of|create image|make an image of|make an image|picture of|photo of|image of/gi, "").trim();
+      imagePrompt = imagePrompt.replace(/ki image banao|ki photo banao|ki tasveer banao|image banao|photo banao|tasveer banao|image generate karo/gi, "").trim();
       if (imagePrompt) {
-        const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 100000)}&nologo=true`;
-        return `Here is your generated image for **"${imagePrompt}"**, Sir:\n\n![${imagePrompt}](${imageUrl})`;
+        const seed = Math.floor(Math.random() * 1000000);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&model=flux&seed=${seed}&nologo=true`;
+        return `🎨 Here is your AI generated artwork for **"${imagePrompt}"**, Sir:\n\n![${imagePrompt}](${imageUrl})\n\n[Open / Save Full Size Image](${imageUrl})`;
+      } else {
+        return "Please describe what image you want me to generate, Sir (e.g. *'Generate image of a futuristic cyber city'*).";
       }
     }
 

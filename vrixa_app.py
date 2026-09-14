@@ -11,6 +11,7 @@ import threading
 import subprocess
 import webbrowser
 import urllib.request
+import urllib.parse
 
 # Third-party packages
 import psutil
@@ -578,6 +579,38 @@ class VrixaBrain:
         # ----------------------------------------------------
         # B. REAL PC & SYSTEM AUTOMATION COMMANDS
         # ----------------------------------------------------
+        # 0. AI Image Generation (FLUX Engine)
+        if any(text.startswith(p) for p in [
+            "generate image", "create image", "make an image", "draw ", "draw a ", "draw an ",
+            "picture of ", "photo of ", "illustration of ", "image of "
+        ]) or any(kw in text for kw in [
+            "image banao", "tasveer banao", "photo banao", "chitra banao",
+            "image generate", "photo generate"
+        ]):
+            clean_prompt = re.sub(
+                r'^(generate\s+(an?\s+)?image(\s+of)?|create\s+(an?\s+)?image(\s+of)?|make\s+(an?\s+)?image(\s+of)?|draw(\s+an?)?|picture\s+of|photo\s+of|illustration\s+of|image\s+of)\s*:?',
+                '',
+                raw_text,
+                flags=re.IGNORECASE
+            ).strip()
+            clean_prompt = re.sub(
+                r'(ki\s+image\s+banao|ki\s+photo\s+banao|ki\s+tasveer\s+banao|image\s+banao|photo\s+banao|tasveer\s+banao|chitra\s+banao)',
+                '',
+                clean_prompt,
+                flags=re.IGNORECASE
+            ).strip()
+
+            if not clean_prompt:
+                return f"Please specify what image you want me to generate, {user_name}!"
+            seed = random.randint(1000, 999999)
+            encoded = urllib.parse.quote(clean_prompt)
+            img_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&model=flux&seed={seed}&nologo=true"
+            try:
+                webbrowser.open(img_url)
+            except Exception:
+                pass
+            return f"🎨 **Generated AI Art for:** \"{clean_prompt}\"\n\nI have generated your image using the FLUX model and opened it in your browser, {user_name}!\nLink: {img_url}"
+
         # 0. Screen Vision AI (Screen Analysis)
         if any(w in text for w in ["analyze screen", "what is on my screen", "screen vision", "screen dekho", "describe screen", "look at my screen", "screen explain"]):
             return SystemAutomation.analyze_screen(self.gemini_client)

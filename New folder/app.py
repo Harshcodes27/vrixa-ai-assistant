@@ -433,6 +433,30 @@ class ProviderConfigRequest(BaseModel):
     enabled: bool | None = None
     model: str | None = None
 
+class ImageGenerateRequest(BaseModel):
+    prompt: str
+    width: int = 1024
+    height: int = 1024
+    seed: int | None = None
+
+def generate_pollinations_image_url(prompt: str, width: int = 1024, height: int = 1024, seed: int | None = None) -> str:
+    clean_prompt = prompt.strip()
+    if not clean_prompt:
+        clean_prompt = "futuristic cyberpunk neon city with flying cars"
+    if seed is None:
+        seed = random.randint(1000, 999999)
+    encoded = urllib.parse.quote(clean_prompt)
+    return f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&model=flux&seed={seed}&nologo=true"
+
+@app.post("/api/generate-image")
+async def api_generate_image(req: ImageGenerateRequest):
+    img_url = generate_pollinations_image_url(req.prompt, req.width, req.height, req.seed)
+    return {
+        "status": "success",
+        "prompt": req.prompt,
+        "image_url": img_url
+    }
+
 @app.get("/api/providers/status")
 async def get_providers_status(gemini_key: str | None = None, groq_key: str | None = None, claude_key: str | None = None, openai_key: str | None = None):
     custom_keys = {}
@@ -560,6 +584,8 @@ async def process_chat(req: ChatRequest):
         text_lower = user_msg.lower()
         reply_text = None
         action_url = None
+        image_url = None
+        provider_used = "vrixa"
 
         # Process Statements (Fact & Event Saving) FIRST if it is clearly a statement!
         is_query = any(w in text_lower for w in ["kya", "what", "konsa", "konsi", "batao", "bato", "list", "tell", "show", "who", "when", "kab", "kaun", "kon"])
@@ -991,6 +1017,36 @@ async def process_chat(req: ChatRequest):
                 if app_target:
                     reply_text = open_desktop_app(app_target)
 
+            # 17. AI Image Generation (FLUX.1 Engine)
+            elif any(text_lower.startswith(p) for p in [
+                "generate image", "create image", "make an image", "draw ", "draw a ", "draw an ",
+                "generate an image", "create an image", "generate photo", "create photo",
+                "picture of ", "photo of ", "illustration of ", "image of "
+            ]) or any(kw in text_lower for kw in [
+                "image banao", "tasveer banao", "photo banao", "chitra banao",
+                "image generate", "photo generate", "tasveer generate"
+            ]):
+                clean_prompt = re.sub(
+                    r'^(generate\s+(an?\s+)?image(\s+of)?|create\s+(an?\s+)?image(\s+of)?|make\s+(an?\s+)?image(\s+of)?|draw(\s+an?)?|picture\s+of|photo\s+of|illustration\s+of|image\s+of|generate\s+photo(\s+of)?|create\s+photo(\s+of)?)\s*:?',
+                    '',
+                    user_msg,
+                    flags=re.IGNORECASE
+                ).strip()
+                clean_prompt = re.sub(
+                    r'(ki\s+image\s+banao|ki\s+photo\s+banao|ki\s+tasveer\s+banao|image\s+banao|photo\s+banao|tasveer\s+banao|chitra\s+banao|image\s+generate\s+karo|photo\s+generate\s+karo|image\s+generate|photo\s+generate)',
+                    '',
+                    clean_prompt,
+                    flags=re.IGNORECASE
+                ).strip()
+
+                if not clean_prompt or len(clean_prompt) < 2:
+                    reply_text = "Please specify what image you want me to generate, Harsh! (e.g. *'Generate image of a futuristic neon sports car'*)."
+                else:
+                    image_url = generate_pollinations_image_url(clean_prompt)
+                    action_url = image_url
+                    reply_text = f"🎨 **Generated AI Art for:** \"{clean_prompt}\"\n\nHere is your high-definition image generated with the FLUX model, Harsh! Click the image preview to view or download full resolution."
+                    provider_used = "vrixa-image"
+
         # Wikipedia queries
         if not reply_text and "wikipedia" in text_lower:
             query = user_msg.replace("wikipedia", "").replace("search", "").strip()
@@ -1001,8 +1057,8 @@ async def process_chat(req: ChatRequest):
                 except Exception:
                     reply_text = "Sorry Sir, I couldn't fetch Wikipedia results."
 
-        provider_used = "vrixa"
         if not reply_text:
+            provider_used = "vrixa"
             now_str = get_ist_now().strftime("%A, %I:%M %p")
             sys_inst = (
                 f"You are VRIXA, an intelligent, conversational AI assistant created by Harsh. Current time: {now_str}. "
@@ -1038,6 +1094,7 @@ async def process_chat(req: ChatRequest):
         return {
             "reply": reply_text,
             "provider": provider_used,
+            "image_url": image_url,
             "action_url": action_url,
             "api_status": api_status,
             "timestamp": timestamp,
@@ -1048,6 +1105,8 @@ async def process_chat(req: ChatRequest):
         err_reply = "Hello Sir, standing by for commands."
         return {
             "reply": err_reply,
+            "provider": "offline",
+            "image_url": None,
             "action_url": None,
             "api_status": "offline",
             "timestamp": timestamp,
